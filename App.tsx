@@ -172,7 +172,31 @@ const App: React.FC = () => {
       <div className="fixed top-20 left-0 w-[300px] h-[300px] bg-purple-900/10 rounded-full blur-[80px] -z-10"></div>
       <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none -z-5"></div>
 
-      {/* Language Toggle */}
+      {/* Navigation Buttons (Left) */}
+      <div className="absolute top-4 left-4 md:top-8 md:left-8 z-50 flex flex-col md:flex-row gap-3 md:gap-4">
+        <a 
+          href="https://mistercuarter.es"
+          className="relative group px-4 py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[100px]"
+        >
+           <span className="absolute inset-0 w-full h-full bg-cyan-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>
+           <span className="relative z-10 flex items-center gap-2">
+             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+             INICIO
+           </span>
+        </a>
+        <a 
+          href="https://laboratorio.mistercuarter.es"
+          className="relative group px-4 py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[120px]"
+        >
+           <span className="absolute inset-0 w-full h-full bg-cyan-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>
+           <span className="relative z-10 flex items-center gap-2">
+             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+             LABORATORIO
+           </span>
+        </a>
+      </div>
+
+      {/* Language Toggle (Right) */}
       <div className="absolute top-4 right-4 md:top-8 md:right-8 z-50">
         <button 
           onClick={() => setLang(prev => prev === 'ES' ? 'EN' : 'ES')}
@@ -183,7 +207,7 @@ const App: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex-grow max-w-6xl mx-auto px-4 py-8 md:py-16 relative z-10 w-full">
+      <div className="flex-grow max-w-6xl mx-auto px-4 py-8 md:py-16 relative z-10 w-full mt-12 md:mt-0">
         
         {/* Header */}
         <header className="mb-10 text-center relative">
