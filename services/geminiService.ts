@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { CharacterParams, GeneratedData, ExpressionEntry } from "../types";
 
@@ -116,7 +117,7 @@ export const generatePrompt = async (params: CharacterParams): Promise<Generated
 };
 
 /**
- * PROTOCOLO PSYCHE 2.0: Genera 4 Hojas de Modelo maestras.
+ * PROTOCOLO PSYCHE 2.1: Genera 4 Hojas de Modelo maestras (Incluyendo INSIGNIA/TOKEN).
  */
 export const generateExpressionSheet = async (params: CharacterParams): Promise<ExpressionEntry[]> => {
   let ai;
@@ -132,8 +133,8 @@ export const generateExpressionSheet = async (params: CharacterParams): Promise<
 
   // Formateamos las reglas según el modo elegido
   const formatRules = isMJ 
-    ? `SI usa el formato Midjourney: Añade "${aspectRatio} --v 6.0" al final de cada prompt. Empieza con "/imagine prompt:". Usa parámetros como "--no overlapping, clutter" si es posible.`
-    : `SI usa el formato GENÉRICO (para Nano Banana, Stable Diffusion, etc): NO uses comandos como /imagine ni parámetros --ar. Escribe una descripción detallada, rica y fluida en inglés. Enfócate en la calidad visual.`;
+    ? `SI usa el formato Midjourney: Añade "${aspectRatio} --v 6.0" al final de cada prompt (EXCEPTO en la Insignia donde puedes usar --ar 1:1 si lo ves mejor, pero por defecto mantén consistencia). Empieza con "/imagine prompt:".`
+    : `SI usa el formato GENÉRICO: NO uses comandos como /imagine. Escribe una descripción detallada en inglés.`;
 
   const systemInstruction = `
     Eres un Director de Arte de Concept Art. Tu objetivo es crear un "Character Design Kit" compuesto por EXACTAMENTE 4 PROMPTS MAESTROS.
@@ -142,13 +143,15 @@ export const generateExpressionSheet = async (params: CharacterParams): Promise<
     1. Define internamente la apariencia exacta (Core Appearance) basada en los inputs.
     2. Aplica esa apariencia a 4 situaciones distintas (Sheets).
     3. Fondo: SIEMPRE "Neutral Solid White Background" para fácil recorte.
-    4. COMPOSICIÓN: Exige SIEMPRE "Wide spacing between figures", "No overlap", "Distinctly separated elements". Queremos que el usuario pueda recortar cada figura fácilmente en Photoshop.
     
     LOS 4 PROMPTS DEBEN SER:
     1. "ARCHITECTURE VIEW": Character Sheet clásico. Front View, Side View, Back View. Usa keywords: "Triptych layout, distinct separation, white space in between".
-    2. "CINEMATIC CUTS": Composición artística. 3/4 Portrait, Extreme Close-up (ojos/cara), Dynamic Action Pose. Usa keywords: "Split screen composition, distinct panels, collage style, isolated figures".
-    3. "EMOTIONAL RANGE A": Full Body Character sheet mostrando 3 emociones distintas (ej: Alegría, Sorpresa, Curiosidad). "Three distinct poses standing side by side, not touching".
-    4. "EMOTIONAL RANGE B": Full Body Character sheet mostrando 3 emociones distintas contrastantes (ej: Enfado, Miedo, Pícaro/Travieso). "Three distinct poses standing side by side, wide gap between characters".
+    2. "CINEMATIC CUTS": Composición artística. 3/4 Portrait, Extreme Close-up (ojos/cara), Dynamic Action Pose. Usa keywords: "Split screen composition, distinct panels, collage style".
+    3. "EMOTIONAL RANGE": Full Body Character sheet mostrando 3 emociones distintas contrastantes (ej: Enfado, Miedo, Pícaro/Travieso).
+    4. "RPG TOKEN / INSIGNIA": Un diseño específico para Avatar o Token de VTT (Roll20/Foundry).
+       - Primer plano (Head & Shoulders) dentro de un MARCO/BORDE DECORATIVO circular o hexagonal.
+       - El estilo del borde debe coincidir con el personaje (ej: Cyberpunk -> Borde de metal y neón; Fantasía -> Borde de oro, madera o piedra rúnica).
+       - Keywords: "RPG Token design, circular badge, thick stylized border, sticker style, white background, vector style rendering, isolated".
 
     REGLAS TÉCNICAS:
     - Idioma: Inglés.
@@ -166,7 +169,7 @@ export const generateExpressionSheet = async (params: CharacterParams): Promise<
     - Colores: ${params.colors.join(", ")}
     - Detalles Clave: ${params.details || "Inventa detalles coherentes de ropa y accesorios"}
     
-    Genera los 4 prompts maestros descritos en las instrucciones.
+    Genera los 4 prompts maestros descritos en las instrucciones (Architecture, Cinematic, Emotions, Insignia).
   `;
 
   const responseSchema: Schema = {
@@ -174,7 +177,7 @@ export const generateExpressionSheet = async (params: CharacterParams): Promise<
     items: {
       type: Type.OBJECT,
       properties: {
-        label: { type: Type.STRING, description: "Título del Sheet (ej: ARCHITECTURE VIEW)" },
+        label: { type: Type.STRING, description: "Título del Sheet (ej: RPG TOKEN / INSIGNIA)" },
         prompt: { type: Type.STRING, description: "El prompt completo." }
       },
       required: ["label", "prompt"]

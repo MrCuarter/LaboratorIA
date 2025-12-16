@@ -1,3 +1,4 @@
+
 import { CharacterParams } from "../types";
 
 // Helper to ensure we don't add empty strings or double spaces
@@ -9,11 +10,12 @@ export const buildLocalPrompt = (params: CharacterParams): string => {
   const isMJ = params.promptFormat === 'midjourney';
   
   // --- 1. SUBJECT CONSTRUCTION ---
-  // "A [Age] [Gender] [Race] [Role] [SubRole] [BodyType] wearing [Details]..."
+  // "A [Age] [Gender] [Race] [Role] [SubRole] [BodyType] [SkinTone] wearing [Details]..."
   const subjectAdjectives = joinParts([params.age, params.gender, params.race]);
   const roleStr = params.subRole ? `${params.role} (${params.subRole})` : params.role;
   
   let subjectSegment = `A ${subjectAdjectives} ${roleStr}`;
+  if (params.skinTone) subjectSegment += `, ${params.skinTone}`;
   if (params.bodyType) subjectSegment += `, with a ${params.bodyType}`;
   if (params.details) subjectSegment += `, wearing ${params.details}`;
 

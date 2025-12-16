@@ -24,6 +24,20 @@ export const GENDERS = [
   { es: "Robot/Sin género", en: "Robot/Genderless", value: "Robot/Genderless" }
 ];
 
+export const SKIN_TONES = [
+  { es: "Pálido", en: "Pale", value: "Pale skin", color: "#fcede4" },
+  { es: "Claro", en: "Fair", value: "Fair skin", color: "#f8d9c6" },
+  { es: "Bronceado", en: "Tan", value: "Tan skin", color: "#d9a484" },
+  { es: "Moreno", en: "Brown", value: "Brown skin", color: "#8d5524" },
+  { es: "Oscuro", en: "Dark", value: "Dark skin", color: "#3f2818" },
+  { es: "Verde (Orco)", en: "Green", value: "Green skin", color: "#5d7c38" },
+  { es: "Azul (Alien)", en: "Blue", value: "Blue skin", color: "#4b8eb8" },
+  { es: "Rojo (Demonio)", en: "Red", value: "Red skin", color: "#a83232" },
+  { es: "Gris (Muerto)", en: "Grey", value: "Grey skin", color: "#7a7a7a" },
+  { es: "Metal (Cyborg)", en: "Metallic", value: "Metallic chrome skin", color: "#b0c4de" },
+  { es: "Oro", en: "Gold", value: "Golden skin", color: "#ffd700" }
+];
+
 export const AGES = [
   { es: "Niño/a", en: "Child", value: "Child" },
   { es: "Adolescente", en: "Teenager", value: "Teenager" },
@@ -44,154 +58,148 @@ export const BODY_TYPES = [
   { es: "Cibernético", en: "Cybernetic", value: "Cybernetically enhanced body" }
 ];
 
-export const ROLES = [
+// FANTASY / SCI-FI ROLES
+export const ROLES_FANTASY = [
   { es: "Guerrero", en: "Warrior", value: "Warrior" },
   { es: "Mago", en: "Mage", value: "Mage" },
   { es: "Hacker", en: "Hacker", value: "Hacker" },
   { es: "Pícaro", en: "Rogue", value: "Rogue" },
   { es: "Mercenario", en: "Mercenary", value: "Mercenary" },
-  { es: "Noble", en: "Noble", value: "Noble" },
   { es: "Monje", en: "Monk", value: "Monk" },
   { es: "Cazador", en: "Hunter", value: "Hunter" },
-  { es: "Científico", en: "Scientist", value: "Scientist" },
-  { es: "Piloto", en: "Pilot", value: "Pilot" },
+  { es: "Piloto Espacial", en: "Space Pilot", value: "Space Pilot" },
   { es: "Sacerdote", en: "Priest", value: "Priest" },
-  { es: "Bardo", en: "Bard", value: "Bard" },
-  { es: "Ingeniero", en: "Engineer", value: "Engineer" },
-  { es: "Chamán", en: "Shaman", value: "Shaman" }
+  { es: "Nigromante", en: "Necromancer", value: "Necromancer" },
+  { es: "Paladín", en: "Paladin", value: "Paladin" },
+  { es: "Chamán", en: "Shaman", value: "Shaman" },
+  { es: "Druida", en: "Druid", value: "Druid" },
+  { es: "Cyborg Ninja", en: "Cyborg Ninja", value: "Cyborg Ninja" }
+];
+
+// REALISTIC ROLES
+export const ROLES_REALISTIC = [
+  { es: "Médico", en: "Doctor", value: "Doctor" },
+  { es: "Soldado", en: "Soldier", value: "Tactical Soldier" },
+  { es: "Policía", en: "Police Officer", value: "Police Officer" },
+  { es: "Bombero", en: "Firefighter", value: "Firefighter" },
+  { es: "Científico", en: "Scientist", value: "Lab Scientist" },
+  { es: "Mecánico", en: "Mechanic", value: "Mechanic" },
+  { es: "Chef", en: "Chef", value: "Professional Chef" },
+  { es: "Atleta", en: "Athlete", value: "Athlete" },
+  { es: "Músico", en: "Musician", value: "Musician" },
+  { es: "Detective", en: "Detective", value: "Detective" },
+  { es: "Profesor", en: "Teacher", value: "Teacher" },
+  { es: "Astronauta", en: "Astronaut", value: "Astronaut" },
+  { es: "Ejecutivo", en: "Business Person", value: "Corporate Executive" },
+  { es: "Influencer", en: "Influencer", value: "Trendy Influencer" }
 ];
 
 // --- EXPRESSION & ACTION ---
 export const EMOTIONS = [
-  { es: "Estoico/Serio", en: "Stoic", value: "Stoic expression" },
+  { es: "Serio", en: "Stoic", value: "Stoic expression" },
   { es: "Alegre", en: "Joyful", value: "Joyful smiling expression" },
   { es: "Furioso", en: "Furious", value: "Furious angry expression" },
-  { es: "Triste", en: "Sorrowful", value: "Sorrowful melancholic expression" },
+  { es: "Triste", en: "Sad", value: "Sorrowful melancholic expression" },
   { es: "Seductor", en: "Seductive", value: "Seductive gaze" },
-  { es: "Aterrorizado", en: "Terrified", value: "Terrified expression" },
-  { es: "Locura", en: "Insane", value: "Insane crazy grin" },
+  { es: "Aterrorizado", en: "Scared", value: "Terrified expression" },
+  { es: "Loco", en: "Crazy", value: "Insane crazy grin" },
   { es: "Determinado", en: "Determined", value: "Determined look" },
   { es: "Misterioso", en: "Mysterious", value: "Mysterious shadow over eyes" }
 ];
 
 export const POSES_IMAGE = [
-  { es: "De pie (Heroico)", en: "Heroic Stance", value: "Standing in a heroic pose" },
-  { es: "Sentado (Trono)", en: "Sitting on Throne", value: "Sitting majestically on a throne" },
+  { es: "Heroico", en: "Heroic", value: "Standing in a heroic pose" },
+  { es: "Sentado", en: "Sitting", value: "Sitting naturally" },
   { es: "Brazos cruzados", en: "Arms Crossed", value: "Arms crossed confidently" },
-  { es: "Pose de Batalla", en: "Battle Stance", value: "Dynamic battle stance ready to fight" },
-  { es: "Flotando/Levitando", en: "Levitating", value: "Levitating in mid-air" },
-  { es: "Arrodillado", en: "Kneeling", value: "Kneeling respectfully" },
-  { es: "Mirando al horizonte", en: "Looking Horizon", value: "Looking away at the horizon" },
-  { es: "Sosteniendo arma", en: "Holding Weapon", value: "Holding a weapon raised high" }
+  { es: "Combate", en: "Combat", value: "Dynamic battle stance ready to fight" },
+  { es: "Flotando", en: "Levitating", value: "Levitating in mid-air" },
+  { es: "Retrato", en: "Portrait", value: "Looking straight at camera" },
+  { es: "De Espaldas", en: "From Behind", value: "View from behind" },
+  { es: "Sosteniendo Objeto", en: "Holding Item", value: "Holding a significant object" }
 ];
 
 export const ACTIONS_VIDEO = [
-  { es: "Caminando hacia cámara", en: "Walking to Camera", value: "Walking confidently towards the camera" },
-  { es: "Corriendo rápido", en: "Sprinting", value: "Sprinting at high speed" },
-  { es: "Luchando / Combatiendo", en: "Fighting", value: "Engaging in intense combat choreography" },
-  { es: "Lanzando hechizo", en: "Casting Spell", value: "Casting a powerful magic spell with visual effects" },
-  { es: "Tecleando (Hacker)", en: "Typing Fast", value: "Typing rapidly on a holographic keyboard" },
+  { es: "Caminando", en: "Walking", value: "Walking confidently towards the camera" },
+  { es: "Corriendo", en: "Running", value: "Sprinting at high speed" },
+  { es: "Luchando", en: "Fighting", value: "Engaging in combat" },
+  { es: "Lanzando Hechizo", en: "Casting", value: "Casting a magic spell" },
+  { es: "Tecleando", en: "Typing", value: "Typing rapidly" },
   { es: "Bailando", en: "Dancing", value: "Dancing rhythmically" },
-  { es: "Transformándose", en: "Transforming", value: "Undergoing a physical transformation" },
-  { es: "Volando", en: "Flying", value: "Flying through the air" },
-  { es: "Llorando", en: "Crying", value: "Crying emotional tears" },
-  { es: "Riendo malvadamente", en: "Evil Laugh", value: "Laughing maniacally" },
-  { es: "Disparando", en: "Shooting", value: "Firing a weapon with recoil" }
+  { es: "Hablando", en: "Talking", value: "Talking expressively" },
+  { es: "Respirando", en: "Breathing", value: "Just breathing heavily, subtle motion" }
 ];
 
 // --- VISUALS ---
 export const STYLES = [
-  // Videojuegos
-  { es: "Estilo World of Warcraft", en: "Warcraft Style", value: "World of Warcraft art style, blizzard stylized 3D, hand-painted textures" },
-  { es: "Estilo Fortnite", en: "Fortnite Style", value: "Fortnite art style, stylized 3D, vibrant colors, clean cartoon shader" },
-  { es: "Estilo Cyberpunk 2077", en: "Cyberpunk 2077", value: "Cyberpunk 2077 art style, hyper-realistic, neon lights, gritty future" },
-  { es: "Estilo Minecraft (Voxel)", en: "Minecraft Style", value: "Minecraft style, voxel art, blocky, square aesthetic" },
-  { es: "Estilo GTA V (Ilustración)", en: "GTA Style", value: "Grand Theft Auto V loading screen art style, digital vector illustration, sharp outlines" },
-  
-  // Animación / Cine
-  { es: "Pixar / Disney 3D", en: "Pixar/Disney 3D", value: "Pixar 3D animation style, cute, expressive, perfect lighting, octane render" },
-  { es: "Spider-Verse (Comic 3D)", en: "Spider-Verse Style", value: "Spider-Man Into the Spider-Verse style, chromatic aberration, halftone dots, graffiti aesthetic" },
-  { es: "Tim Burton (Pesadilla antes de Navidad)", en: "Tim Burton Style", value: "Tim Burton art style, gothic, stop-motion, Nightmare Before Christmas aesthetic, dark whimsical" },
-  { es: "Los Simpson", en: "The Simpsons", value: "The Simpsons art style, yellow skin, 2D cartoon, matt groening style" },
-  { es: "Futurama", en: "Futurama", value: "Futurama art style, 2D sci-fi cartoon, cel shaded" },
-  { es: "Studio Ghibli (Anime)", en: "Studio Ghibli", value: "Studio Ghibli art style, Hayao Miyazaki, hand-drawn, lush backgrounds, watercolor sky" },
-  { es: "Wes Anderson (Simetría Pastel)", en: "Wes Anderson", value: "Wes Anderson movie style, symmetrical composition, pastel color palette, whimsical" },
-  
-  // Clásico / Artístico
-  { es: "Manga (Blanco y Negro)", en: "Manga B&W", value: "Japanese Manga style, black and white ink, screentones, dynamic lines" },
-  { es: "Anime 90s (Retro)", en: "90s Anime", value: "90s retro anime style, cel animation, grain, Sailor Moon/Dragon Ball aesthetic" },
-  { es: "Plastilina (Claymation)", en: "Claymation", value: "Aardman Claymation style, plasticine texture, stop-motion, fingerprint details" },
-  { es: "Lego", en: "Lego", value: "Lego brick aesthetic, plastic texture, toy photography" },
-  { es: "Funko Pop", en: "Funko Pop", value: "Funko Pop vinyl figure, big head, black eyes, toy packaging box" },
-  { es: "Cinematográfico Realista (8k)", en: "Cinematic Realistic", value: "Cinematic movie shot, 8k resolution, photorealistic, depth of field" },
-  { es: "Pintura al Óleo", en: "Oil Painting", value: "Classic Oil Painting, textured brushstrokes, masterpiece" },
-  { es: "Boceto a Lápiz", en: "Pencil Sketch", value: "Detailed charcoal and pencil sketch" }
+  { es: "Realista (Cine)", en: "Cinematic", value: "Cinematic movie shot, 8k resolution, photorealistic, depth of field" },
+  { es: "3D Pixar/Disney", en: "Pixar 3D", value: "Pixar 3D animation style, cute, expressive, perfect lighting" },
+  { es: "Cyberpunk", en: "Cyberpunk", value: "Cyberpunk 2077 art style, hyper-realistic, neon lights" },
+  { es: "Anime", en: "Anime", value: "Studio Ghibli art style, high quality anime" },
+  { es: "Ilustración 2D", en: "2D Vector", value: "Digital vector illustration, sharp outlines, flat colors" },
+  { es: "Oleo", en: "Oil Painting", value: "Classic Oil Painting, textured brushstrokes" },
+  { es: "Comic", en: "Comic Book", value: "Comic book style, halftone dots, bold lines" },
+  { es: "World of Warcraft", en: "Warcraft", value: "Blizzard style, hand painted textures, stylized 3D" },
+  { es: "Blanco y Negro", en: "B&W", value: "Black and white photography, noir style" },
+  { es: "Claymation", en: "Clay", value: "Claymation style, plasticine texture" }
 ];
 
 // --- COMPOSITION ---
 export const FRAMINGS = [
-  { es: "Primer Plano (Rostro)", en: "Close-Up", value: "Extreme close-up on face" },
-  { es: "Plano Medio", en: "Medium Shot", value: "Medium shot from waist up" },
+  { es: "Rostro (Primer Plano)", en: "Face Close-Up", value: "Extreme close-up on face" },
+  { es: "Medio Cuerpo", en: "Waist Up", value: "Medium shot from waist up" },
   { es: "Cuerpo Entero", en: "Full Body", value: "Full body shot showing shoes to head" },
-  { es: "Plano General (Paisaje)", en: "Wide Shot", value: "Wide cinematic shot showing environment" },
-  { es: "Contrapicado (Desde abajo)", en: "Low Angle", value: "Low angle shot looking up, heroic" },
-  { es: "Picado (Desde arriba)", en: "High Angle", value: "High angle shot looking down" },
-  { es: "Vista de Dron", en: "Drone View", value: "Aerial drone view" },
-  { es: "Ojo de Pez", en: "Fisheye", value: "Distorted Fisheye lens" }
+  { es: "Paisaje / Lejos", en: "Wide Shot", value: "Wide cinematic shot showing environment" },
+  { es: "Desde Arriba", en: "High Angle", value: "High angle shot looking down" },
+  { es: "Desde Abajo", en: "Low Angle", value: "Low angle shot looking up" }
 ];
 
 export const LIGHTINGS = [
-  { es: "Cinemática Dramática", en: "Dramatic Cinematic", value: "Dramatic cinematic lighting, chiaroscuro" },
-  { es: "Luz de Neón", en: "Neon Lighting", value: "Colorful neon lighting, pink and blue rim lights" },
-  { es: "Hora Dorada (Atardecer)", en: "Golden Hour", value: "Golden hour warm sunlight" },
-  { es: "Volumétrica (Rayos de Dios)", en: "Volumetric", value: "Volumetric lighting, god rays, hazy" },
-  { es: "Estudio Fotográfico", en: "Studio", value: "Professional 3-point studio lighting, softbox" },
-  { es: "Oscura / Tenebrosa", en: "Dark/Moody", value: "Dark moody lighting, shadows" },
-  { es: "Bioluminiscencia", en: "Bioluminescent", value: "Magical bioluminescent glow" }
+  { es: "Dramática", en: "Dramatic", value: "Dramatic cinematic lighting, chiaroscuro" },
+  { es: "Neón", en: "Neon", value: "Colorful neon lighting" },
+  { es: "Natural (Día)", en: "Natural", value: "Natural daylight" },
+  { es: "Atardecer", en: "Sunset", value: "Golden hour warm sunlight" },
+  { es: "Estudio", en: "Studio", value: "Professional studio lighting" },
+  { es: "Oscura", en: "Dark", value: "Dark moody lighting, shadows" },
+  { es: "Mágica", en: "Magical", value: "Magical glowing particles lighting" }
 ];
 
 export const ATMOSPHERES = [
-  { es: "Limpia / Clara", en: "Clear", value: "Clear atmosphere" },
-  { es: "Neblina / Niebla", en: "Foggy", value: "Thick fog, misty atmosphere" },
-  { es: "Lluvia", en: "Rainy", value: "Heavy rain, wet surfaces" },
-  { es: "Nieve", en: "Snowy", value: "Falling snow, blizzard" },
-  { es: "Polvorienta", en: "Dusty", value: "Dust particles in air, sandstorm" },
-  { es: "Chispas y Fuego", en: "Embers", value: "Floating fire embers and sparks" },
-  { es: "Cibernética (Glitch)", en: "Digital Glitch", value: "Digital glitch artifacts, holographic air" }
+  { es: "Limpia", en: "Clean", value: "Clear atmosphere" },
+  { es: "Niebla", en: "Foggy", value: "Thick fog, misty atmosphere" },
+  { es: "Lluvia", en: "Rain", value: "Heavy rain, wet surfaces" },
+  { es: "Nieve", en: "Snow", value: "Falling snow" },
+  { es: "Polvo/Arena", en: "Dusty", value: "Dust particles in air" },
+  { es: "Fuego/Brasas", en: "Fire", value: "Floating fire embers and sparks" },
+  { es: "Glitch Digital", en: "Glitch", value: "Digital glitch artifacts" }
 ];
 
 export const SETTINGS = [
-  { es: "Ciudad Neón", en: "Neon City", value: "Futuristic Neon City" },
-  { es: "Bosque Mágico", en: "Magic Forest", value: "Enchanted Forest" },
-  { es: "Estación Espacial", en: "Space Station", value: "Sci-Fi Space Station interior" },
-  { es: "Mazmorra", en: "Dungeon", value: "Medieval Dark Dungeon" },
-  { es: "Desierto", en: "Desert", value: "Vast Desert dunes" },
-  { es: "Laboratorio", en: "Laboratory", value: "High-Tech Laboratory" },
-  { es: "Palacio Real", en: "Royal Palace", value: "Opulent Royal Palace" },
-  { es: "Campo de Batalla", en: "Battlefield", value: "War-torn Battlefield" },
-  { es: "Taverna", en: "Tavern", value: "Cozy Fantasy Tavern" },
-  { es: "Montañas Nevadas", en: "Snowy Mountains", value: "Snowy Mountain peaks" },
-  { es: "Playa Tropical", en: "Beach", value: "Tropical Beach paradise" },
-  { es: "Ruinas Antiguas", en: "Ruins", value: "Ancient Stone Ruins" }
+  { es: "Contextual (Según Rol)", en: "Contextual", value: "In a setting appropriate for their profession/role" },
+  { es: "Ciudad Futurista", en: "Future City", value: "Futuristic Neon City" },
+  { es: "Naturaleza / Bosque", en: "Nature", value: "Deep Forest nature" },
+  { es: "Espacio", en: "Space", value: "Sci-Fi Space Station" },
+  { es: "Interior Habitación", en: "Indoor", value: "Interior room detail" },
+  { es: "Ruinas", en: "Ruins", value: "Ancient Ruins" },
+  { es: "Desierto", en: "Desert", value: "Vast Desert" },
+  { es: "Fondo Blanco", en: "White BG", value: "Isolated on Solid White background" },
+  { es: "Fondo Negro", en: "Black BG", value: "Isolated on Solid Black background" },
+  { es: "Estudio", en: "Studio", value: "Simple Studio background" }
 ];
 
+// Mapped for simpler usage in Quick Mode, keeps compatibility
 export const BACKGROUNDS = [
-  { es: "Detallado (Según Entorno)", en: "Detailed Environment", value: "Detailed Environment" },
-  { es: "Chroma Key (Verde)", en: "Green Screen", value: "Solid Green Screen background (Chroma Key)" },
-  { es: "Fondo Blanco Infinito", en: "Solid White", value: "Isolated on Solid White background" },
-  { es: "Fondo Negro Infinito", en: "Solid Black", value: "Isolated on Solid Black background" },
-  { es: "Gradiente Abstracto", en: "Gradient", value: "Abstract Colorful Gradient background" },
-  { es: "Bokeh (Desenfocado)", en: "Bokeh", value: "Blurry Bokeh lights background" }
+  { es: "Detallado", en: "Detailed", value: "Detailed Environment" },
+  { es: "Simple / Desenfocado", en: "Simple", value: "Blurry Bokeh lights background" },
+  { es: "Blanco (Recortar)", en: "Solid White", value: "Isolated on Solid White background" },
+  { es: "Verde (Chroma)", en: "Green Screen", value: "Solid Green Screen background" }
 ];
 
 export const ASPECT_RATIOS = [
-  { label: "16:9 (Cinematic)", value: "--ar 16:9" },
-  { label: "1:1 (Square)", value: "--ar 1:1" },
-  { label: "9:16 (Portrait/TikTok)", value: "--ar 9:16" },
-  { label: "21:9 (Ultrawide)", value: "--ar 21:9" },
-  { label: "4:3 (TV Classic)", value: "--ar 4:3" },
-  { label: "3:2 (Photo)", value: "--ar 3:2" },
-  { label: "4:5 (Instagram)", value: "--ar 4:5" }
+  { label: "Cine (16:9)", value: "--ar 16:9" },
+  { label: "Cuadrado (1:1)", value: "--ar 1:1" },
+  { label: "Móvil (9:16)", value: "--ar 9:16" },
+  { label: "Retrato (4:5)", value: "--ar 4:5" },
+  { label: "TV (4:3)", value: "--ar 4:3" }
 ];
 
 // --- ELITE PRESETS (CURATED CHARACTERS) ---
@@ -199,7 +207,7 @@ export const PRESETS = [
   {
     name: "CYBER RONIN 2077",
     params: {
-      race: "Human", gender: "Female", age: "Young Adult", role: "Warrior", subRole: "Cyber-Samurai",
+      race: "Human", gender: "Female", age: "Young Adult", role: "Warrior", subRole: "Cyber-Samurai", skinTone: "Pale skin", classCategory: 'fantasy',
       bodyType: "Athletic build", style: "Cyberpunk 2077 art style, hyper-realistic, neon lights, gritty future",
       setting: "Futuristic Neon City", background: "Detailed Environment",
       emotion: "Determined look", pose: "Dynamic battle stance ready to fight",
@@ -211,7 +219,7 @@ export const PRESETS = [
   {
     name: "ELVEN ARCHMAGE",
     params: {
-      race: "Elf", gender: "Male", age: "Ancient", role: "Mage", subRole: "Archdruid",
+      race: "Elf", gender: "Male", age: "Ancient", role: "Mage", subRole: "Archdruid", skinTone: "Fair skin", classCategory: 'fantasy',
       bodyType: "Slender build", style: "World of Warcraft art style, blizzard stylized 3D, hand-painted textures",
       setting: "Enchanted Forest", background: "Detailed Environment",
       emotion: "Stoic expression", pose: "Levitating in mid-air",
@@ -223,35 +231,35 @@ export const PRESETS = [
   {
     name: "NOIR DETECTIVE BOT",
     params: {
-      race: "Android", gender: "Male", age: "Adult", role: "Mercenary", subRole: "Detective",
+      race: "Android", gender: "Male", age: "Adult", role: "Mercenary", subRole: "Detective", skinTone: "Metallic chrome skin", classCategory: 'fantasy',
       bodyType: "Stocky build", style: "Cinematic movie shot, 8k resolution, photorealistic, depth of field",
       setting: "Futuristic Neon City", background: "Detailed Environment",
       emotion: "Mysterious shadow over eyes", pose: "Looking away at the horizon",
-      framing: "Close-Up", lighting: "Dark/Moody", atmosphere: "Foggy",
+      framing: "Face Close-Up", lighting: "Dark/Moody", atmosphere: "Foggy",
       colors: ["#1a1a1a", "#ff4500"], details: "Rusted metal face plating, smoking a holographic cigar, trench coat",
       aspectRatio: "--ar 21:9"
     }
   },
   {
-    name: "SPACE MARINE COMMANDER",
+    name: "SWAT COMMANDER",
     params: {
-      race: "Human", gender: "Female", age: "Middle-Aged", role: "Pilot", subRole: "Commander",
+      race: "Human", gender: "Female", age: "Middle-Aged", role: "Soldier", subRole: "Commander", skinTone: "Tan skin", classCategory: 'realistic',
       bodyType: "Heavily muscular", style: "Cinematic Realistic",
-      setting: "Sci-Fi Space Station interior", background: "Detailed Environment",
+      setting: "In a setting appropriate for their profession/role", background: "Detailed Environment",
       emotion: "Determined look", pose: "Standing in a heroic pose",
-      framing: "Low angle shot looking up, heroic", lighting: "Dramatic cinematic lighting, chiaroscuro", atmosphere: "Clear atmosphere",
-      colors: ["#000080", "#c0c0c0"], details: "Wearing heavy power armor with battle damage, holding a helmet under arm",
+      framing: "Low angle shot looking up", lighting: "Dramatic cinematic lighting", atmosphere: "Clean",
+      colors: ["#000080", "#c0c0c0"], details: "Wearing heavy tactical gear, radio equipment, holding helmet",
       aspectRatio: "--ar 16:9"
     }
   },
    {
     name: "ORC WARLORD",
     params: {
-      race: "Orc", gender: "Male", age: "Adult", role: "Warrior", subRole: "Chieftain",
+      race: "Orc", gender: "Male", age: "Adult", role: "Warrior", subRole: "Chieftain", skinTone: "Green skin", classCategory: 'fantasy',
       bodyType: "Heavily muscular", style: "Oil Painting",
       setting: "War-torn Battlefield", background: "Detailed Environment",
-      emotion: "Furious angry expression", pose: "Battle Stance",
-      framing: "Full Body", lighting: "Volumetric", atmosphere: "Dusty",
+      emotion: "Furious angry expression", pose: "Combat",
+      framing: "Full Body", lighting: "Dramatic", atmosphere: "Dusty",
       colors: ["#8b0000", "#2f4f4f"], details: "Wielding a massive dual-headed axe, warpaint on face, tribal tattoos",
       aspectRatio: "--ar 3:2"
     }

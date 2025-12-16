@@ -2,24 +2,31 @@
 export type Language = 'ES' | 'EN';
 
 export interface CharacterParams {
-  mode: 'image' | 'video'; // New
-  promptFormat: 'midjourney' | 'generic'; // New
+  mode: 'image' | 'video'; 
+  promptFormat: 'midjourney' | 'generic'; 
+  designMode: 'quick' | 'advanced'; // New: UI State
+  
+  // Attributes
   race: string;
   gender: string;
-  age: string; // New
+  age: string;
+  skinTone: string; // New
+  classCategory: 'fantasy' | 'realistic'; // New
   role: string;
-  subRole: string; // New
-  bodyType: string; // New
+  subRole: string;
+  bodyType: string;
+  
+  // Visuals
   style: string;
   setting: string;
-  background: string; // New (Chroma, White, etc)
-  emotion: string; // New
-  pose: string; // New (For Image)
-  action: string; // New (For Video)
-  framing: string; // New
-  lighting: string; // New
-  atmosphere: string; // New
-  colors: string[]; // New
+  background: string;
+  emotion: string;
+  pose: string; 
+  action: string; 
+  framing: string; 
+  lighting: string;
+  atmosphere: string;
+  colors: string[]; 
   details: string;
   aspectRatio: string;
 }
