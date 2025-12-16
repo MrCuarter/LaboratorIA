@@ -23,11 +23,12 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
     { id: 3, key: 'skinTone', titleEs: "Tono de Piel", titleEn: "Skin Tone" },
     { id: 4, key: 'classCategory', titleEs: "Categoría de Clase", titleEn: "Class Category" },
     { id: 5, key: 'role', titleEs: "Elige Profesión / Clase", titleEn: "Choose Profession / Class" },
-    { id: 6, key: 'emotion', titleEs: "Carácter / Emoción", titleEn: "Character / Emotion" },
-    { id: 7, key: 'style', titleEs: "Estilo Visual", titleEn: "Visual Style" },
-    { id: 8, key: 'framing', titleEs: "Encuadre de Cámara", titleEn: "Camera Framing" },
-    { id: 9, key: 'setting', titleEs: "Fondo / Entorno", titleEn: "Background / Setting" },
-    { id: 10, key: 'aspectRatio', titleEs: "Formato", titleEn: "Format" },
+    { id: 6, key: 'secondaryRole', titleEs: "Clase Secundaria (Opcional)", titleEn: "Secondary Class (Optional)" }, // NEW STEP
+    { id: 7, key: 'emotion', titleEs: "Carácter / Emoción", titleEn: "Character / Emotion" },
+    { id: 8, key: 'style', titleEs: "Estilo Visual", titleEn: "Visual Style" },
+    { id: 9, key: 'framing', titleEs: "Encuadre de Cámara", titleEn: "Camera Framing" },
+    { id: 10, key: 'setting', titleEs: "Fondo / Entorno", titleEn: "Background / Setting" },
+    { id: 11, key: 'aspectRatio', titleEs: "Formato", titleEn: "Format" },
   ];
 
   const handleSelect = (key: keyof CharacterParams, value: any, stepId: number) => {
@@ -121,31 +122,50 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
                 ))}
             </div>
         );
-      case 6: // EMOTION
+      case 6: // SECONDARY ROLE (OPTIONAL)
+        const secRoles = params.classCategory === 'realistic' ? C.ROLES_REALISTIC : C.ROLES_FANTASY;
+        return (
+            <div className="space-y-4">
+                <div className="flex justify-center mb-2">
+                    <button 
+                       onClick={() => handleSelect('secondaryRole', '', 6)} // Skip/None option
+                       className="text-xs text-slate-500 hover:text-cyan-400 uppercase tracking-widest border border-slate-700 hover:border-cyan-500 px-4 py-2 rounded-sm"
+                    >
+                       {lang === 'ES' ? "Saltar / Ninguna" : "Skip / None"}
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                    {secRoles.map(opt => (
+                    <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.secondaryRole === opt.value} onClick={(v: string) => handleSelect('secondaryRole', v, 6)} />
+                    ))}
+                </div>
+            </div>
+        );
+      case 7: // EMOTION
          return (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {C.EMOTIONS.map(opt => (
-                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.emotion === opt.value} onClick={(v: string) => handleSelect('emotion', v, 6)} />
+                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.emotion === opt.value} onClick={(v: string) => handleSelect('emotion', v, 7)} />
                 ))}
             </div>
         );
-      case 7: // STYLE
+      case 8: // STYLE
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {C.STYLES.map(opt => (
-                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.style === opt.value} onClick={(v: string) => handleSelect('style', v, 7)} />
+                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.style === opt.value} onClick={(v: string) => handleSelect('style', v, 8)} />
                 ))}
             </div>
         );
-      case 8: // FRAMING
+      case 9: // FRAMING
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {C.FRAMINGS.map(opt => (
-                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.framing === opt.value} onClick={(v: string) => handleSelect('framing', v, 8)} />
+                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.framing === opt.value} onClick={(v: string) => handleSelect('framing', v, 9)} />
                 ))}
             </div>
         );
-      case 9: // BACKGROUND
+      case 10: // BACKGROUND
         const bgOptions = [...C.SETTINGS.filter(s => s.value.includes('Contextual') || s.value.includes('White') || s.value.includes('Studio')), ...C.BACKGROUNDS];
         // Unique logic
         const seen = new Set();
@@ -158,15 +178,15 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         return (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {uniqueBgs.map(opt => (
-                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.setting === opt.value} onClick={(v: string) => handleSelect('setting', v, 9)} />
+                <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.setting === opt.value} onClick={(v: string) => handleSelect('setting', v, 10)} />
                 ))}
             </div>
         );
-      case 10: // ASPECT RATIO
+      case 11: // ASPECT RATIO
          return (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
                 {C.ASPECT_RATIOS.map(opt => (
-                <StepButton key={opt.value} label={opt.label} value={opt.value} active={params.aspectRatio === opt.value} onClick={(v: string) => handleSelect('aspectRatio', v, 10)} />
+                <StepButton key={opt.value} label={opt.label} value={opt.value} active={params.aspectRatio === opt.value} onClick={(v: string) => handleSelect('aspectRatio', v, 11)} />
                 ))}
             </div>
         );

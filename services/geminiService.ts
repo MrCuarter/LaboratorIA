@@ -7,21 +7,10 @@ const modelId = "gemini-2.5-flash";
 // Helper para obtener la instancia de IA de forma segura
 const getAI = () => {
   const apiKey = process.env.API_KEY;
-  
-  // Depuración en consola (F12)
-  if (!apiKey) {
-    console.error("DEBUG: La API Key es undefined o null.");
-  } else if (apiKey === "") {
-    console.error("DEBUG: La API Key es un string vacío. Vite no la ha inyectado.");
-  } else {
-    // console.log("DEBUG: API Key detectada.");
-  }
-
-  // Verificación estricta
   if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === "") {
-    throw new Error("API Key no configurada. Asegúrate de que la variable API_KEY existe en Vercel y has hecho Redeploy.");
+    console.error("DEBUG: La API Key es inválida.");
+    throw new Error("API Key no configurada.");
   }
-
   return new GoogleGenAI({ apiKey });
 };
 
@@ -39,48 +28,77 @@ export const generatePrompt = async (params: CharacterParams): Promise<Generated
 
   const systemInstruction = `
     Eres un Arquitecto de Prompts IA experto (Prompt Engineer).
-    Tu tarea es generar un prompt optimizado basado en los parámetros del usuario.
+    Tu tarea es generar un prompt optimizado EN INGLÉS basado en los parámetros del usuario.
     
-    IDIOMA DE SALIDA: Inglés (SIEMPRE).
     MODO: ${params.mode.toUpperCase()}
     FORMATO: ${params.promptFormat.toUpperCase()}
 
     === REGLAS CRÍTICAS DE FORMATO ===
-    
     SI EL FORMATO ES "MIDJOURNEY":
     1. Comienza con "/imagine prompt:".
     2. Usa sintaxis de parámetros: añade "${params.aspectRatio} --v 6.0" al final.
-    3. Usa "::" para pesos si es necesario (ej: "Character::2 Background::1").
 
-    SI EL FORMATO ES "GENERIC" (Stable Diffusion / Flux / DALL-E):
-    1. PROHIBIDO usar comandos que empiecen por "--" o "/" (Ej: NO USAR --ar, --v, --no, /imagine).
-    2. Convierte el Aspect Ratio a lenguaje natural (Ej: si el usuario pide 16:9, escribe "cinematic 16:9 aspect ratio").
-    3. Estructura: "Subject description, Action, Environment, Artstyle keywords, Quality tags".
-    4. Usa palabras clave de calidad: "masterpiece, best quality, ultra-detailed, 8k uhd".
+    SI EL FORMATO ES "GENERIC":
+    1. PROHIBIDO usar comandos que empiecen por "--".
+    2. Convierte el Aspect Ratio a lenguaje natural.
+    3. Usa palabras clave de calidad: "masterpiece, best quality, ultra-detailed".
 
-    === PALETA DE COLOR ===
-    Colores obligatorios: ${params.colors.join(", ")}.
+    === GESTIÓN DE COLORES (CRÍTICO) ===
+    - Si se especifican colores HEX, descríbelos con nombres artísticos (ej: #FF0000 -> "Crimson Red").
+    - Si hay 2 colores para un elemento (pelo, ojos, piel), descríbelo como "Two-toned [Color1] and [Color2]" o "Heterochromia".
   `;
 
-  const actionPart = isVideo ? `Acción (VIDEO): ${params.action}` : `Pose (IMAGEN): ${params.pose}`;
+  // Construcción de la descripción física compleja
+  const physParts = [];
+  
+  const hairC = params.hairColors?.join(" & ");
+  if (params.hairStyle) physParts.push(`${hairC || ''} ${params.hairStyle} hair`);
+  
+  const eyeC = params.eyeColors?.join(" & ");
+  const eyeF = params.eyeFeature || "eyes";
+  physParts.push(`${eyeC || ''} ${eyeF}`);
+  
+  const skinC = params.skinColor?.join(" & ");
+  if (skinC) physParts.push(`${skinC} colored skin`);
+  else if (params.skinTone) physParts.push(`${params.skinTone}`);
 
+  if (params.faceMarkings && params.faceMarkings !== 'None') physParts.push(`${params.faceMarkings}`);
+  if (params.denture) physParts.push(`with ${params.denture}`);
+  
+  // Construcción del Outfit
+  const outfitParts = [];
+  const outfitC = params.outfitColors?.join(" & ");
+  const colorContext = outfitC ? `(Color Palette: ${outfitC})` : "";
+
+  if (params.headwear && params.headwear !== 'None') outfitParts.push(`wearing ${params.headwear}`);
+  
+  if (params.fullBody) outfitParts.push(`dressed in ${params.fullBody}`);
+  else {
+      if (params.upperBody) outfitParts.push(`wearing ${params.upperBody}`);
+      if (params.lowerBody) outfitParts.push(`${params.lowerBody}`);
+  }
+  
+  if (params.classExtras) outfitParts.push(`equipped with ${params.classExtras}`);
+  if (params.footwear) outfitParts.push(`${params.footwear}`);
+  if (params.heldItem && params.heldItem !== 'Nothing') outfitParts.push(`holding ${params.heldItem}`);
+
+  let roleDesc = params.role;
+  if (params.secondaryRole) roleDesc += ` / ${params.secondaryRole}`;
+  
   const userPrompt = `
     Genera un prompt con estos datos:
-    - Sujeto: ${params.race} ${params.subRole ? `(${params.subRole})` : params.role}
-    - Género: ${params.gender}
-    - Edad: ${params.age}
-    - Cuerpo: ${params.bodyType}
+    - Sujeto: ${params.race} ${roleDesc} (${params.classCategory})
+    - Género: ${params.gender}, Edad: ${params.age}, Cuerpo: ${params.bodyType}
+    - RASGOS DETALLADOS: ${physParts.join(", ")}
+    - EQUIPAMIENTO: ${outfitParts.join(", ")} ${colorContext}
     - Emoción: ${params.emotion}
-    - ${actionPart}
+    - Acción/Pose: ${isVideo ? params.action : params.pose}
     - Estilo: ${params.style}
-    - Encuadre: ${params.framing}
-    - Iluminación: ${params.lighting}
-    - Atmósfera: ${params.atmosphere}
-    - Entorno: ${params.setting}
-    - Tipo de Fondo: ${params.background}
-    - Colores Clave: ${params.colors.join(", ")}
+    - Entorno: ${params.setting} (${params.atmosphere}, ${params.lighting})
+    - Fondo: ${params.background}
+    - Colores Ambiente: ${params.colors.join(", ")}
     - Detalles extra: ${params.details}
-    - Formato de Aspecto: ${params.aspectRatio} (Recuerda: si es Genérico, tradúcelo a texto, NO uses --ar).
+    - Formato: ${params.aspectRatio}
     
     Output JSON.
   `;
@@ -95,14 +113,8 @@ export const generatePrompt = async (params: CharacterParams): Promise<Generated
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            prompt: {
-              type: Type.STRING,
-              description: isMJ ? "El prompt completo con /imagine y parámetros." : "La descripción detallada sin parámetros técnicos.",
-            },
-            negativePrompt: {
-              type: Type.STRING,
-              description: "Lista de exclusión (deformidades, watermark, text, etc).",
-            },
+            prompt: { type: Type.STRING },
+            negativePrompt: { type: Type.STRING },
           },
           required: ["prompt", "negativePrompt"],
         },
@@ -111,7 +123,6 @@ export const generatePrompt = async (params: CharacterParams): Promise<Generated
 
     const jsonText = response.text;
     if (!jsonText) throw new Error("No response text from Gemini");
-
     return JSON.parse(jsonText) as GeneratedData;
 
   } catch (error) {
@@ -121,7 +132,7 @@ export const generatePrompt = async (params: CharacterParams): Promise<Generated
 };
 
 /**
- * PROTOCOLO PSYCHE 4.0: Genera 7 Hojas Maestras (Updated).
+ * PROTOCOLO PSYCHE 6.0: 7 Hojas Maestras con SAFETY MARGINS.
  */
 export const generateExpressionSheet = async (params: CharacterParams): Promise<ExpressionEntry[]> => {
   let ai;
@@ -134,98 +145,47 @@ export const generateExpressionSheet = async (params: CharacterParams): Promise<
 
   const isMJ = params.promptFormat === 'midjourney';
   
-  // Definimos las reglas de formato dinámicamente para permitir distintos Aspect Ratios
-  const formatRules = isMJ 
-    ? `FORMATO MIDJOURNEY: Empieza con "/imagine prompt:". AL FINAL, añade los parámetros específicos indicados para cada imagen (ej: --ar 3:2 o --ar 1:1) seguido de "--v 6.0".`
-    : `FORMATO GENÉRICO: Descripción detallada en inglés puro. PROHIBIDO usar --ar, --v o /imagine. Incluye la descripción del formato (ej: "square format" o "widescreen layout") en el texto.`;
+  let roleDesc = params.role;
+  if (params.secondaryRole) roleDesc += ` / ${params.secondaryRole}`;
+
+  const hairC = params.hairColors?.join(" and ");
+  const outfitC = params.outfitColors?.join(" and ");
 
   const systemInstruction = `
-    Eres un Director de Arte de Concept Art (Protocolo PSYCHE v4.0).
-    Tu objetivo es crear un "Character Design Kit" compuesto por EXACTAMENTE 7 PROMPTS MAESTROS.
+    Eres un Director de Arte de Concept Art (Protocolo PSYCHE v6.0).
+    Tu objetivo es crear un "Character Design Kit" de 7 Prompts EN INGLÉS.
     
-    ESTRATEGIA DE CONSISTENCIA GLOBAL (ADN VISUAL):
-    Debes definir internamente un "Visual DNA" y aplicarlo a TODOS los prompts para evitar alucinaciones entre imágenes.
-    1. ESTILO BASE: ${params.style} (Pero fuerza siempre: "clean linework, high definition, no noise").
-    2. COLORES: ${params.colors.join(", ")} (Mantén esta paleta estricta).
-    3. ANATOMÍA: ${params.bodyType}, ${params.gender}, ${params.race}. (Fuerza: "identical proportions across all images").
-    4. FONDO: SIEMPRE "pure solid white background (#FFFFFF), no shadows, no gradients, subject fully isolated, cutout-ready".
-
-    LOS 7 PROMPTS MAESTROS (SECUECIA ESTRICTA):
+    ESTRATEGIA VISUAL:
+    1. ESTILO: ${params.style}.
+    2. SUJETO: ${params.race} ${roleDesc}, ${params.gender}.
+    3. DETALLES: ${hairC} ${params.hairStyle}, ${params.eyeFeature}.
+    4. ROPA: ${params.fullBody || params.upperBody}, Colors: ${outfitC}.
+    5. CLASS ITEM: ${params.classExtras}.
     
-    1. "ARCHITECTURE VIEW" (Referencia Técnica):
-       - Triptych layout: Front View, Side View, Back View.
-       - Neutral expression. Arms slightly away (A-Pose).
-       - Keywords: "Model sheet, technical drawing layout, distinct separation".
-       - Aspect Ratio: ${isMJ ? '--ar 3:2' : 'landscape'}.
+    REGULACIÓN DE ESPACIO (SAFETY MARGIN):
+    Es CRÍTICO que las figuras NO SE TOQUEN NI SE SOLAPEN en los sheets.
+    - Usa keywords: "distinct separation", "wide spacing", "isolated figures", "grid layout".
+    - Negative Prompt Implícito: "overlapping, touching, merged bodies".
 
-    2. "CINEMATIC NARRATIVE" (Lenguaje Corporal):
-       - Solo Busto/Medio Cuerpo.
-       - Acción sutil relacionada con su rol (${params.role}).
-       - Keywords: "Cinematic lighting, depth of field, focused, character portrait".
-       - Aspect Ratio: ${isMJ ? '--ar 3:2' : 'landscape'}.
-
-    3. "ACTION POSES A" (Poses Dinámicas Set 1):
-       - Triptych / Three characters layout (Full Body).
-       - Pose 1: Profile view, arms crossed, confident, looking at camera.
-       - Pose 2: Alert combat stance, gritting teeth, aggressive.
-       - Pose 3: Smiling, thumbs up, winking one eye.
-       - Keywords: "Action sheet, dynamic poses, character study".
-       - Aspect Ratio: ${isMJ ? '--ar 3:2' : 'landscape'}.
-
-    4. "ACTION POSES B" (Poses Dinámicas Set 2):
-       - Triptych / Three characters layout (Full Body).
-       - Pose 1: Crouching low, one hand on ground, looking at camera with curiosity/strangeness.
-       - Pose 2: Walking away (view from back/side), looking back over shoulder.
-       - Pose 3: Facepalm gesture (hand covering face), embarrassed or resigned expression.
-       - Keywords: "Action sheet, dynamic poses, character study".
-       - Aspect Ratio: ${isMJ ? '--ar 3:2' : 'landscape'}.
-
-    5. "EXPRESSIONS GRID" (Grid de 6 Caras):
-       - Layout: 2 rows of 3 images (6 distinct panels in total).
-       - Framing: Chest-up / Headshots.
-       - Expressions: 1.Happy, 2.Tired, 3.Disgusted, 4.Scared, 5.Exultant, 6.Angry.
-       - Keywords: "Expression sheet, 2x3 grid, emotional study, facial chart".
-       - Aspect Ratio: ${isMJ ? '--ar 3:2' : 'landscape'}.
-
-    6. "RPG TOKEN / INSIGNIA" (Uso en VTT - Formato Cuadrado):
-       - Head & Shoulders inside a DECORATIVE BORDER (Circular/Hexagonal).
-       - Stylized border matching character theme (Metal/Gold/Magic).
-       - Optimized for small scale readability (High contrast).
-       - Keywords: "RPG Token, sticker style, vector rendering, thick border".
-       - Aspect Ratio: ${isMJ ? '--ar 1:1' : 'square format'}.
-
-    7. "VICTORY POSE" (Iconic/Promotional):
-       - Full body, dynamic victory or confident pose.
-       - NO background environment. Use ABSTRACT elements only (glow, particles, symbol) behind character.
-       - Keywords: "Hero shot, promotional art, dynamic angle, particle effects".
-       - Aspect Ratio: ${isMJ ? '--ar 3:2' : 'landscape'}.
-
-    EXCLUSIONES GLOBALES (Negative Prompt Implicito):
-    - No background scenes, no props lying around, no text, no logos, no extra characters, no motion blur, no deformation.
-
-    REGLAS TÉCNICAS:
-    - Idioma: Inglés (Output en Inglés).
-    - Output: Array de Objetos JSON.
-    - ${formatRules}
+    LOS 7 PROMPTS MAESTROS:
+    1. "ARCHITECTURE VIEW": Triptych (Front, Side, Back). Wide spacing. A-Pose.
+    2. "CINEMATIC NARRATIVE": Bust shot. Cinematic lighting.
+    3. "ACTION POSES A": 3 Dynamic Poses (Fighting/Confident). Distinct separation.
+    4. "ACTION POSES B": 3 Interaction/Movement Poses. Distinct separation.
+    5. "EXPRESSIONS GRID": 2x3 grid of facial expressions.
+    6. "RPG TOKEN": Head inside decorative border. Square format.
+    7. "VICTORY POSE": Full body dynamic victory pose. No background scenery.
   `;
 
-  const userPrompt = `
-    Genera el Kit de Diseño COMPLETO (7 Prompts) para:
-    - Personaje: ${params.race} ${params.role} (${params.subRole})
-    - Apariencia: ${params.age}, ${params.skinTone}
-    - Estilo Visual: ${params.style}
-    - Detalles Clave: ${params.details}
-    
-    Asegúrate de que los 7 prompts sigan estrictamente las poses descritas en las instrucciones.
-  `;
+  const userPrompt = `Genera el Kit (7 Prompts) para ${roleDesc}. Include physical traits: ${hairC} ${params.hairStyle}, ${params.eyeFeature}.`;
 
   const responseSchema: Schema = {
     type: Type.ARRAY,
     items: {
       type: Type.OBJECT,
       properties: {
-        label: { type: Type.STRING, description: "Título del Sheet (ej: ACTION POSES A)" },
-        prompt: { type: Type.STRING, description: "El prompt completo." }
+        label: { type: Type.STRING },
+        prompt: { type: Type.STRING }
       },
       required: ["label", "prompt"]
     }
@@ -243,81 +203,40 @@ export const generateExpressionSheet = async (params: CharacterParams): Promise<
     });
 
     const jsonText = response.text;
-    if (!jsonText) throw new Error("No response text from Gemini");
-
+    if (!jsonText) throw new Error("No response text");
     return JSON.parse(jsonText) as ExpressionEntry[];
 
   } catch (error) {
-    console.error("Error generating expression sheet:", error);
+    console.error("Error generating sheets:", error);
     throw error;
   }
 };
 
-/**
- * PROTOCOLO INVENTARIO: Genera un Sprite Sheet de objetos (Assets).
- */
 export const generateInventoryPrompt = async (params: CharacterParams): Promise<GeneratedData> => {
-  let ai;
-  try {
-    ai = getAI();
-  } catch (e: any) {
-    console.error("Failed to initialize AI:", e);
-    throw new Error(e.message);
-  }
+    let ai;
+    try {
+        ai = getAI();
+    } catch (e: any) {
+        throw new Error(e.message);
+    }
+    const isMJ = params.promptFormat === 'midjourney';
+    const outfitC = params.outfitColors?.join(" and ");
 
-  const isMJ = params.promptFormat === 'midjourney';
-  // Asset sheet suele funcionar mejor apaisado para tener espacio
-  const assetRatio = "--ar 3:2"; 
-
-  const systemInstruction = `
-    Eres un Diseñador de Assets de Videojuegos (Game Asset Designer).
-    Tu tarea es crear un PROMPT para generar una "Hoja de Inventario" (Sprite Sheet) con los objetos que llevaría el personaje descrito.
+    const systemInstruction = `
+        Eres un Diseñador de Assets de Videojuegos.
+        Genera una Hoja de Inventario (Sprite Sheet, Knolling style) para: ${params.race} ${params.role}.
+        Estilo: ${params.style}.
+        Items clave: ${params.heldItem}, ${params.headwear}, ${params.footwear}, ${params.classExtras}.
+        Paleta de items: ${outfitC}.
+        Fondo: Solid White. Objetos separados.
+        Format: ${isMJ ? '/imagine prompt: ... --ar 3:2' : 'Detailed description without --ar'}.
+        OUTPUT ENGLISH.
+    `;
     
-    ESTILO DE DISEÑO (CRÍTICO):
-    - TÉCNICA: "Knolling photography" o "Flat Lay". Objetos organizados en una cuadrícula invisible o líneas paralelas.
-    - SEPARACIÓN: Los objetos NO deben tocarse ni solaparse (para poder recortarlos fácilmente en Photoshop).
-    - FONDO: "Solid White Background" o "Solid Neutral Hex Background".
-    - CONTENIDO: 6 a 10 objetos relevantes para la clase/rol del personaje (armas, pociones, gadgets, libros, munición, comida, herramientas).
-    - ESTILO VISUAL: Debe coincidir EXACTAMENTE con el estilo del personaje (ej: si es Cyberpunk, los objetos son neón/tech; si es Fantasía, son madera/acero/magia).
-
-    FORMATO:
-    - ${isMJ ? `Empieza con "/imagine prompt:". Termina con "${assetRatio} --v 6.0".` : "Descripción detallada para Stable Diffusion/DALL-E. NO usar comandos --ar."}
-  `;
-
-  const userPrompt = `
-    Personaje: ${params.race} ${params.role} (${params.subRole}).
-    Estilo Visual: ${params.style}.
-    Colores: ${params.colors.join(", ")}.
-    
-    Genera un prompt para una HOJA DE INVENTARIO con el equipamiento típico de este personaje.
-    Output JSON.
-  `;
-
-  try {
     const response = await ai.models.generateContent({
-      model: modelId,
-      contents: userPrompt,
-      config: {
-        systemInstruction: systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            prompt: { type: Type.STRING, description: "Prompt para generar la hoja de inventario." },
-            negativePrompt: { type: Type.STRING, description: "Negative prompt (blur, crop, hand, fingers, text)." }
-          },
-          required: ["prompt", "negativePrompt"]
-        },
-      },
+        model: modelId,
+        contents: "Genera prompt inventario.",
+        config: { systemInstruction, responseMimeType: "application/json", responseSchema: { type: Type.OBJECT, properties: { prompt: {type: Type.STRING}, negativePrompt: {type:Type.STRING} } } }
     });
-
-    const jsonText = response.text;
-    if (!jsonText) throw new Error("No response text from Gemini");
-
-    return JSON.parse(jsonText) as GeneratedData;
-
-  } catch (error) {
-    console.error("Error generating inventory:", error);
-    throw error;
-  }
+    return JSON.parse(response.text!) as GeneratedData;
 };
