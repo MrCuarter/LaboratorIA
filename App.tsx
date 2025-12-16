@@ -408,9 +408,17 @@ const App: React.FC = () => {
 
       {/* HEADER NAVBAR (Existing) */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-[#030712]/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 md:px-8 flex justify-between items-center shadow-lg shadow-cyan-900/5 transition-all">
-         <div className="flex gap-3 md:gap-4">
-            <a href="https://mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[90px] md:min-w-[100px] rounded-sm" onMouseEnter={() => sfx.playHover()}>
+         <div className="flex gap-2 md:gap-4 overflow-x-auto no-scrollbar">
+            <a href="https://mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[90px] md:min-w-[100px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
                  <span className="absolute inset-0 w-full h-full bg-cyan-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>INICIO</span>
+            </a>
+            
+            <a href="https://laboratorio.mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-purple-400 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[110px] md:min-w-[120px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
+                 <span className="absolute inset-0 w-full h-full bg-purple-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>LABORATORIO</span>
+            </a>
+
+            <a href="https://atlascore.mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-amber-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[110px] md:min-w-[120px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
+                 <span className="absolute inset-0 w-full h-full bg-amber-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>ATLAS_CORE</span>
             </a>
          </div>
          <div className="flex items-center gap-3 md:gap-4">
