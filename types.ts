@@ -34,6 +34,8 @@ export interface CharacterParams {
 export interface GeneratedData {
   prompt: string;
   negativePrompt: string;
+  timestamp?: number; // Added for History
+  modelParams?: Partial<CharacterParams>; // Added to restore state
 }
 
 export interface ExpressionEntry {

@@ -60,7 +60,8 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
       onClick={() => onClick(value)}
       onMouseEnter={() => sfx.playHover()}
       className={`
-        relative p-4 rounded-sm border transition-all duration-300 flex flex-col items-center justify-center gap-2 group
+        relative p-4 md:p-5 rounded-sm border transition-all duration-200 flex flex-col items-center justify-center gap-2 group w-full
+        active:scale-95 touch-manipulation
         ${active 
             ? 'bg-cyan-500/20 border-cyan-400 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] ring-1 ring-cyan-500/50' 
             : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 hover:bg-slate-800'
@@ -70,7 +71,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
       {color && (
           <div className="w-8 h-8 rounded-full border border-slate-500 shadow-sm mb-1" style={{ backgroundColor: color }}></div>
       )}
-      <span className="text-sm md:text-base font-bold uppercase tracking-widest text-center">{label}</span>
+      <span className="text-sm md:text-base font-bold uppercase tracking-widest text-center leading-tight">{label}</span>
       {active && (
          <div className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_5px_cyan]"></div>
       )}
@@ -78,10 +79,11 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
   );
 
   const renderStepContent = (stepId: number) => {
+    // Mobile First approach: grid-cols-1 by default for ease of use, grid-cols-2/3/4 on larger screens
     switch (stepId) {
       case 1: // GENDER
         return (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {C.GENDERS.map(opt => (
               <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.gender === opt.value} onClick={(v: string) => handleSelect('gender', v, 1)} />
             ))}
@@ -89,7 +91,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         );
       case 2: // RACE
         return (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {C.RACES.map(opt => (
               <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.race === opt.value} onClick={(v: string) => handleSelect('race', v, 2)} />
             ))}
@@ -97,7 +99,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         );
       case 3: // SKIN TONE
         return (
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
             {C.SKIN_TONES.map(opt => (
               <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} color={opt.color} active={params.skinTone === opt.value} onClick={(v: string) => handleSelect('skinTone', v, 3)} />
             ))}
@@ -105,15 +107,15 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         );
       case 4: // CATEGORY
          return (
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto">
                  <StepButton label={lang === 'ES' ? "Fantasía / Sci-Fi" : "Fantasy / Sci-Fi"} value="fantasy" active={params.classCategory === 'fantasy'} onClick={(v: any) => handleSelect('classCategory', v, 4)} />
                  <StepButton label={lang === 'ES' ? "Realista / Actual" : "Realistic / Modern"} value="realistic" active={params.classCategory === 'realistic'} onClick={(v: any) => handleSelect('classCategory', v, 4)} />
              </div>
          );
-      case 5: // ROLE
+      case 5: // ROLE - Single column on mobile for long names
         const roles = params.classCategory === 'realistic' ? C.ROLES_REALISTIC : C.ROLES_FANTASY;
         return (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 {roles.map(opt => (
                 <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.role === opt.value} onClick={(v: string) => handleSelect('role', v, 5)} />
                 ))}
@@ -121,7 +123,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         );
       case 6: // EMOTION
          return (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {C.EMOTIONS.map(opt => (
                 <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.emotion === opt.value} onClick={(v: string) => handleSelect('emotion', v, 6)} />
                 ))}
@@ -129,7 +131,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         );
       case 7: // STYLE
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {C.STYLES.map(opt => (
                 <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.style === opt.value} onClick={(v: string) => handleSelect('style', v, 7)} />
                 ))}
@@ -137,7 +139,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         );
       case 8: // FRAMING
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {C.FRAMINGS.map(opt => (
                 <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.framing === opt.value} onClick={(v: string) => handleSelect('framing', v, 8)} />
                 ))}
@@ -154,7 +156,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         });
 
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {uniqueBgs.map(opt => (
                 <StepButton key={opt.value} label={lang === 'ES' ? opt.es : opt.en} value={opt.value} active={params.setting === opt.value} onClick={(v: string) => handleSelect('setting', v, 9)} />
                 ))}
@@ -162,7 +164,7 @@ export const QuickDesignWizard: React.FC<QuickDesignWizardProps> = ({ lang, para
         );
       case 10: // ASPECT RATIO
          return (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
                 {C.ASPECT_RATIOS.map(opt => (
                 <StepButton key={opt.value} label={opt.label} value={opt.value} active={params.aspectRatio === opt.value} onClick={(v: string) => handleSelect('aspectRatio', v, 10)} />
                 ))}

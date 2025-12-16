@@ -8,7 +8,8 @@ import { ColorPicker } from './components/ColorPicker';
 import { TerminalOutput } from './components/TerminalOutput';
 import { QuickDesignWizard } from './components/QuickDesignWizard';
 import { Logo } from './components/Logo';
-import { AssistantHud } from './components/AssistantHud'; 
+import { AssistantHud } from './components/AssistantHud';
+import { HistorySidebar } from './components/HistorySidebar'; // New component
 import { generatePrompt, generateExpressionSheet } from './services/geminiService';
 import { buildLocalPrompt } from './services/promptBuilder'; 
 import { CharacterParams, GeneratedData, LoadingState, Language, ExpressionEntry } from './types';
@@ -18,7 +19,11 @@ import { sfx } from './services/audioEngine';
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ES');
   const [isMuted, setIsMuted] = useState(false); 
-  const [isTutorialMode, setIsTutorialMode] = useState(false); 
+  const [isTutorialMode, setIsTutorialMode] = useState(false);
+  const [crtMode, setCrtMode] = useState(true); // Default to on for "wow" factor
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<GeneratedData[]>([]);
+  
   const [assistantMessage, setAssistantMessage] = useState("Sistemas en línea. Esperando input...");
   
   const [params, setParams] = useState<CharacterParams>({
@@ -56,6 +61,18 @@ const App: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.IDLE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Load History from LocalStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('neo_history');
+    if (saved) {
+      try {
+        setHistory(JSON.parse(saved));
+      } catch (e) {
+        console.error("Corrupt history data");
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const handleInteraction = () => {
        sfx.playStartup();
@@ -76,6 +93,11 @@ const App: React.FC = () => {
     if (!muted) sfx.playClick();
   };
 
+  const toggleCrt = () => {
+    setCrtMode(!crtMode);
+    sfx.playClick();
+  };
+
   const toggleTutorial = () => {
     const newState = !isTutorialMode;
     setIsTutorialMode(newState);
@@ -85,6 +107,18 @@ const App: React.FC = () => {
             ? "Protocolo N.E.O. activado. Pasa el cursor sobre cualquier elemento de la interfaz para recibir análisis táctico en tiempo real." 
             : "N.E.O. Protocol initialized. Hover over any interface element to receive real-time tactical analysis.");
     }
+  };
+
+  const addToHistory = (data: GeneratedData) => {
+    const newItem = { ...data, timestamp: Date.now(), modelParams: params };
+    const newHistory = [newItem, ...history].slice(0, 20); // Keep last 20
+    setHistory(newHistory);
+    localStorage.setItem('neo_history', JSON.stringify(newHistory));
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem('neo_history');
   };
 
   const help = (textEs: string, textEn: string) => {
@@ -139,6 +173,7 @@ const App: React.FC = () => {
     try {
       const result = await generatePrompt(params);
       setGeneratedData(result);
+      addToHistory(result); // Auto-save
       setLoadingState(LoadingState.SUCCESS);
       sfx.playSuccess(); 
     } catch (error) {
@@ -266,7 +301,7 @@ const App: React.FC = () => {
 
   const T = {
     ES: {
-      subtitle: "[ Sistema de Arquitectura de Personajes v4.5 ]",
+      subtitle: "[ Sistema de Arquitectura de Personajes v5.0 GOLD ]",
       designedSuffix: "Diseñado por Mr. Cuarter",
       race: "Especie / Raza",
       gender: "Género",
@@ -330,7 +365,7 @@ const App: React.FC = () => {
       designedBy: "Diseñada por",
     },
     EN: {
-      subtitle: "[ Character Architecture System v4.5 ]",
+      subtitle: "[ Character Architecture System v5.0 GOLD ]",
       designedSuffix: "Designed by Mr. Cuarter",
       race: "Species / Race",
       gender: "Gender",
@@ -400,6 +435,14 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen w-full bg-[#030712] relative overflow-x-hidden selection:bg-cyan-500 selection:text-black flex flex-col font-sans">
       
+      {/* --- CRT OVERLAY --- */}
+      {crtMode && (
+        <div className="fixed inset-0 z-[999] pointer-events-none mix-blend-screen opacity-60">
+           <div className="crt-overlay absolute inset-0"></div>
+           <div className="scanline absolute inset-0"></div>
+        </div>
+      )}
+
       {/* Background FX */}
       <div className="fixed top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#050505] to-black -z-10"></div>
       <div className="fixed bottom-0 right-0 w-[500px] h-[500px] bg-cyan-900/10 rounded-full blur-[100px] -z-10"></div>
@@ -407,27 +450,38 @@ const App: React.FC = () => {
       <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none -z-5"></div>
 
       {/* HEADER NAVBAR (Existing) */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-[#030712]/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 md:px-8 flex justify-between items-center shadow-lg shadow-cyan-900/5 transition-all">
-         <div className="flex gap-2 md:gap-4 overflow-x-auto no-scrollbar">
-            <a href="https://mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[90px] md:min-w-[100px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
-                 <span className="absolute inset-0 w-full h-full bg-cyan-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>INICIO</span>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-[#030712]/80 backdrop-blur-md border-b border-slate-800 px-4 py-2 md:py-3 md:px-8 flex justify-between items-center shadow-lg shadow-cyan-900/5 transition-all">
+         <div className="flex gap-2 md:gap-4 overflow-x-auto no-scrollbar mask-image-fade-sides">
+            <a href="https://mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center md:min-w-[100px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
+                 <span className="absolute inset-0 w-full h-full bg-cyan-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><span className="hidden md:inline">INICIO</span></span>
             </a>
             
-            <a href="https://laboratorio.mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-purple-400 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[110px] md:min-w-[120px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
-                 <span className="absolute inset-0 w-full h-full bg-purple-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>LABORATORIO</span>
+            <a href="https://laboratorio.mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-purple-400 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center md:min-w-[120px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
+                 <span className="absolute inset-0 w-full h-full bg-purple-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg><span className="hidden md:inline">LABORATORIO</span></span>
             </a>
 
-            <a href="https://atlascore.mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-amber-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[110px] md:min-w-[120px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
-                 <span className="absolute inset-0 w-full h-full bg-amber-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>ATLAS_CORE</span>
+            <a href="https://atlascore.mistercuarter.es" className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-amber-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center md:min-w-[120px] rounded-sm shrink-0" onMouseEnter={() => sfx.playHover()}>
+                 <span className="absolute inset-0 w-full h-full bg-amber-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span><span className="relative z-10 flex items-center gap-2"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span className="hidden md:inline">ATLAS_CORE</span></span>
             </a>
          </div>
-         <div className="flex items-center gap-3 md:gap-4">
-            <div className="flex items-center gap-3 cursor-pointer group" onMouseEnter={() => sfx.playHover()}>
-                <h2 className="hidden md:block text-lg font-bold tracking-wider text-slate-200 group-hover:text-cyan-400 transition-colors brand-font">
+         <div className="flex items-center gap-2 md:gap-4 shrink-0">
+            <div className="hidden md:flex items-center gap-3 cursor-pointer group" onMouseEnter={() => sfx.playHover()}>
+                <h2 className="text-lg font-bold tracking-wider text-slate-200 group-hover:text-cyan-400 transition-colors brand-font">
                     NEO<span className="text-cyan-500">GENESIS</span>
                 </h2>
-                <Logo className="w-10 h-10 md:w-12 md:h-12 shrink-0 group-hover:rotate-180 transition-transform duration-700" />
+                <Logo className="w-8 h-8 md:w-12 md:h-12 shrink-0 group-hover:rotate-180 transition-transform duration-700" />
             </div>
+
+            {/* NEW: CRT Toggle */}
+            <button onClick={toggleCrt} className={`relative group w-8 h-8 md:w-10 md:h-10 overflow-hidden bg-slate-900 border ${crtMode ? 'border-cyan-500 text-cyan-400 shadow-[0_0_10px_cyan]' : 'border-slate-700 text-slate-500'} text-[10px] font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center rounded-sm`} title="Toggle CRT FX" onMouseEnter={() => sfx.playHover()}>
+                 <span className="relative z-10 text-[8px] md:text-[10px] font-mono">CRT</span>
+            </button>
+
+            {/* NEW: History Toggle */}
+             <button onClick={() => {setShowHistory(true); sfx.playClick()}} className={`relative group w-8 h-8 md:w-10 md:h-10 overflow-hidden bg-slate-900 border border-slate-700 text-amber-500 text-[10px] font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center rounded-sm`} title="Memory Core" onMouseEnter={() => sfx.playHover()}>
+                 <span className="absolute inset-0 w-full h-full bg-amber-500/10 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-sm"></span><span className="relative z-10"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span>
+            </button>
+
              <button onClick={toggleTutorial} className={`relative group w-8 h-8 md:w-10 md:h-10 overflow-hidden bg-slate-900 border ${isTutorialMode ? 'border-green-500 text-green-400' : 'border-slate-700 text-slate-500'} text-[10px] font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center rounded-sm`} title="Toggle Assistant" onMouseEnter={() => sfx.playHover()}>
                  <span className={`absolute inset-0 w-full h-full ${isTutorialMode ? 'bg-green-500/10' : 'bg-cyan-500/20'} scale-0 group-hover:scale-100 transition-transform duration-300 rounded-sm`}></span><span className="relative z-10 font-mono text-xs font-bold">?</span>
             </button>
@@ -440,12 +494,24 @@ const App: React.FC = () => {
          </div>
       </nav>
 
-      <div className="flex-grow max-w-6xl mx-auto px-4 py-8 md:py-16 relative z-10 w-full mt-24">
+      <HistorySidebar 
+        isOpen={showHistory} 
+        onClose={() => setShowHistory(false)} 
+        history={history}
+        onSelect={(item) => {
+            setGeneratedData(item);
+            if (item.modelParams) setParams(item.modelParams as any);
+        }}
+        onClear={clearHistory}
+        lang={lang}
+      />
+
+      <div className="flex-grow max-w-6xl mx-auto px-4 py-8 md:py-16 relative z-10 w-full mt-20 md:mt-24">
         
         {/* HERO TITLE */}
         <header className="mb-8 text-center relative">
            <div className="flex flex-col items-center justify-center mb-4">
-              <h1 className="text-4xl md:text-7xl font-bold glitch-wrapper text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 tracking-tighter">
+              <h1 className="text-3xl md:text-7xl font-bold glitch-wrapper text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 tracking-tighter">
                 <span className="glitch" data-text="NEOGENESIS">NEO<span className="text-white">GENESIS</span></span>
               </h1>
               <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 mt-2">
@@ -454,7 +520,7 @@ const App: React.FC = () => {
            </div>
            
            {/* UNIFIED ACTION BUTTONS ROW (Elite First) */}
-           <div className="flex flex-col md:flex-row justify-center items-center gap-6 mt-6">
+           <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 mt-6">
                 
                 {/* 1. ELITE AGENT (Coherent) - NOW FIRST */}
                 <button
@@ -466,7 +532,7 @@ const App: React.FC = () => {
                             "🛡️ ELITE AGENT: Deploys a pre-configured, coherent profile ready for action."
                         );
                     }}
-                    className="group relative w-full md:w-auto px-10 overflow-hidden bg-slate-950 border border-cyan-500/40 hover:border-cyan-400 transition-all rounded-sm py-4 shadow-[0_0_15px_rgba(6,182,212,0.1)] hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] min-w-[280px]"
+                    className="group relative w-full md:w-auto px-6 md:px-10 overflow-hidden bg-slate-950 border border-cyan-500/40 hover:border-cyan-400 transition-all rounded-sm py-4 shadow-[0_0_15px_rgba(6,182,212,0.1)] hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] min-w-[280px] active:scale-95"
                 >
                     <div className="absolute inset-0 bg-cyan-900/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
                     <span className="relative z-10 flex flex-col items-center justify-center gap-1">
@@ -487,7 +553,7 @@ const App: React.FC = () => {
                             "⚠️ GENOME EXPERIMENTATION: Unpredictable random mutation. Mixes DNA and disparate concepts."
                         );
                     }}
-                    className="group relative w-full md:w-auto px-10 overflow-hidden bg-slate-950 border border-purple-500/40 hover:border-purple-400 transition-all rounded-sm py-4 shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_25px_rgba(168,85,247,0.25)] min-w-[280px]"
+                    className="group relative w-full md:w-auto px-6 md:px-10 overflow-hidden bg-slate-950 border border-purple-500/40 hover:border-purple-400 transition-all rounded-sm py-4 shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_25px_rgba(168,85,247,0.25)] min-w-[280px] active:scale-95"
                 >
                     <div className="absolute inset-0 bg-purple-900/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
                     <span className="relative z-10 flex flex-col items-center justify-center gap-1">
@@ -504,7 +570,7 @@ const App: React.FC = () => {
         </header>
 
         {/* Global Controls: Design Mode & Format */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-8 max-w-5xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-4 mb-8 max-w-5xl mx-auto">
             
             {/* Design Mode Toggle (NEW) */}
             <FuturisticToggle 
@@ -538,7 +604,7 @@ const App: React.FC = () => {
         </div>
 
         {/* MAIN INTERFACE CONTAINER */}
-        <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800 p-6 md:p-8 rounded-lg relative shadow-2xl shadow-cyan-900/10 min-h-[600px]">
+        <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800 p-4 md:p-8 rounded-lg relative shadow-2xl shadow-cyan-900/10 min-h-[600px]">
            {/* Decorative Corners */}
            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-500 rounded-tl-lg"></div>
            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyan-500 rounded-tr-lg"></div>
@@ -573,7 +639,7 @@ const App: React.FC = () => {
                         </button>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <FuturisticSelect 
                         label={t.race} value={params.race} onChange={(v) => setParams(prev => ({...prev, race: v}))} options={mapOpts(C.RACES)} 
                         onHelp={() => help("Define la especie base.", "Defines base species.")}
@@ -584,7 +650,7 @@ const App: React.FC = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                        <FuturisticSelect 
                         label={t.age} value={params.age} onChange={(v) => setParams(prev => ({...prev, age: v}))} options={mapOpts(C.AGES)} 
                         onHelp={() => help("Edad aparente.", "Apparent age.")}
@@ -680,7 +746,7 @@ const App: React.FC = () => {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </button>
                     </div>
-                     <div className="grid grid-cols-2 gap-3">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <FuturisticSelect 
                             label={t.framing} value={params.framing} onChange={(v) => setParams(prev => ({...prev, framing: v}))} options={mapOpts(C.FRAMINGS)} 
                             onHelp={() => help("Cámara.", "Camera.")}
@@ -694,7 +760,7 @@ const App: React.FC = () => {
                         label={t.atmosphere} value={params.atmosphere} onChange={(v) => setParams(prev => ({...prev, atmosphere: v}))} options={mapOpts(C.ATMOSPHERES)} 
                         onHelp={() => help("Ambiente.", "Atmosphere.")}
                      />
-                     <div className="grid grid-cols-2 gap-3">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <FuturisticSelect 
                             label={t.setting} value={params.setting} onChange={(v) => setParams(prev => ({...prev, setting: v}))} options={mapOpts(C.SETTINGS)} 
                             onHelp={() => help("Ubicación.", "Location.")}
@@ -766,7 +832,7 @@ const App: React.FC = () => {
                 relative px-8 py-5 bg-transparent overflow-hidden group
                 text-cyan-400 font-bold uppercase tracking-[0.2em] text-sm transition-all
                 disabled:opacity-50 disabled:cursor-not-allowed w-full md:flex-1
-                border border-cyan-500/50 group-hover:border-cyan-400
+                border border-cyan-500/50 group-hover:border-cyan-400 active:scale-95 touch-manipulation min-h-[60px]
               `}
              >
                <span className="absolute inset-0 w-full h-full bg-cyan-500/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></span>
@@ -797,7 +863,7 @@ const App: React.FC = () => {
                 relative px-8 py-5 bg-transparent overflow-hidden group
                 text-amber-400 font-bold uppercase tracking-[0.2em] text-sm transition-all
                 disabled:opacity-50 disabled:cursor-not-allowed w-full md:flex-1
-                border border-amber-500/30 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)] hover:shadow-[0_0_25px_rgba(245,158,11,0.3)]
+                border border-amber-500/30 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)] hover:shadow-[0_0_25px_rgba(245,158,11,0.3)] active:scale-95 touch-manipulation min-h-[60px]
               `}
              >
                <span className="absolute inset-0 w-full h-full bg-amber-500/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-500"></span>
@@ -821,13 +887,13 @@ const App: React.FC = () => {
         {expressionSheet && (
           <div id="expression-section" className="w-full mt-16 relative">
              <div className="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-amber-900/30 pb-4 gap-4">
-                <h3 className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 tracking-wider brand-font">
+                <h3 className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 tracking-wider brand-font text-center md:text-left">
                    {t.psycheTitle}
                 </h3>
                 <button
                    onClick={handleCopyAllExpressions}
                    onMouseEnter={() => sfx.playHover()}
-                   className="w-full md:w-auto text-sm md:text-base bg-amber-600/20 border border-amber-500 hover:bg-amber-500 hover:text-black text-amber-300 px-6 py-4 uppercase font-black tracking-widest transition-all rounded-sm flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] transform hover:-translate-y-1"
+                   className="w-full md:w-auto text-sm md:text-base bg-amber-600/20 border border-amber-500 hover:bg-amber-500 hover:text-black text-amber-300 px-6 py-4 uppercase font-black tracking-widest transition-all rounded-sm flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] transform hover:-translate-y-1 active:scale-95 touch-manipulation"
                 >
                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
                    {copiedAllExpressions ? "COPIED!" : (params.promptFormat === 'midjourney' ? t.btnCopyAllMJ : t.btnCopyAllGen)}
@@ -841,8 +907,8 @@ const App: React.FC = () => {
                       <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-500 opacity-30 group-hover:opacity-100 transition-opacity"></div>
                       <div className="flex justify-between items-center mb-4">
                          <span className="text-xs text-amber-400 font-black tracking-[0.2em] uppercase bg-amber-950/40 px-3 py-1 rounded-sm border border-amber-900/50">{item.label}</span>
-                         <button onClick={() => handleCopyMatrixItem(item.prompt, idx)} onMouseEnter={() => sfx.playHover()} className="text-slate-500 hover:text-white transition-colors p-1">
-                            {copiedMatrixIndex === idx ? <span className="text-green-400 text-xs font-bold flex items-center gap-1">COPIED <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg></span> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>}
+                         <button onClick={() => handleCopyMatrixItem(item.prompt, idx)} onMouseEnter={() => sfx.playHover()} className="text-slate-500 hover:text-white transition-colors p-2 md:p-1 active:scale-110">
+                            {copiedMatrixIndex === idx ? <span className="text-green-400 text-xs font-bold flex items-center gap-1">COPIED <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg></span> : <svg className="w-6 h-6 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>}
                          </button>
                       </div>
                       <div className="bg-black/40 p-3 rounded-sm border border-slate-800 flex-grow">
