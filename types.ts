@@ -1,3 +1,4 @@
+
 export type Language = 'ES' | 'EN';
 
 export interface CharacterParams {
@@ -26,6 +27,11 @@ export interface CharacterParams {
 export interface GeneratedData {
   prompt: string;
   negativePrompt: string;
+}
+
+export interface ExpressionEntry {
+  label: string;
+  prompt: string;
 }
 
 export enum LoadingState {

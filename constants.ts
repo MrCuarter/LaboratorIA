@@ -1,3 +1,4 @@
+
 // --- IDENTITY ---
 export const RACES = [
   { es: "Humano", en: "Human", value: "Human" },
@@ -175,7 +176,7 @@ export const SETTINGS = [
 ];
 
 export const BACKGROUNDS = [
-  { es: "Detallado (Según Entorno)", en: "Detailed Environment", value: "Detailed background matching the setting" },
+  { es: "Detallado (Según Entorno)", en: "Detailed Environment", value: "Detailed Environment" },
   { es: "Chroma Key (Verde)", en: "Green Screen", value: "Solid Green Screen background (Chroma Key)" },
   { es: "Fondo Blanco Infinito", en: "Solid White", value: "Isolated on Solid White background" },
   { es: "Fondo Negro Infinito", en: "Solid Black", value: "Isolated on Solid Black background" },
@@ -191,4 +192,68 @@ export const ASPECT_RATIOS = [
   { label: "4:3 (TV Classic)", value: "--ar 4:3" },
   { label: "3:2 (Photo)", value: "--ar 3:2" },
   { label: "4:5 (Instagram)", value: "--ar 4:5" }
+];
+
+// --- ELITE PRESETS (CURATED CHARACTERS) ---
+export const PRESETS = [
+  {
+    name: "CYBER RONIN 2077",
+    params: {
+      race: "Human", gender: "Female", age: "Young Adult", role: "Warrior", subRole: "Cyber-Samurai",
+      bodyType: "Athletic build", style: "Cyberpunk 2077 art style, hyper-realistic, neon lights, gritty future",
+      setting: "Futuristic Neon City", background: "Detailed Environment",
+      emotion: "Determined look", pose: "Dynamic battle stance ready to fight",
+      framing: "Full body shot showing shoes to head", lighting: "Neon Lighting", atmosphere: "Rainy",
+      colors: ["#00ffff", "#ff00ff"], details: "Wearing a transparent raincoat over cybernetic armor, holding a glowing katana",
+      aspectRatio: "--ar 16:9"
+    }
+  },
+  {
+    name: "ELVEN ARCHMAGE",
+    params: {
+      race: "Elf", gender: "Male", age: "Ancient", role: "Mage", subRole: "Archdruid",
+      bodyType: "Slender build", style: "World of Warcraft art style, blizzard stylized 3D, hand-painted textures",
+      setting: "Enchanted Forest", background: "Detailed Environment",
+      emotion: "Stoic expression", pose: "Levitating in mid-air",
+      framing: "Medium shot from waist up", lighting: "Bioluminescent", atmosphere: "Embers",
+      colors: ["#32cd32", "#ffd700"], details: "Surrounded by floating runes and ancient vines, eyes glowing with arcane power",
+      aspectRatio: "--ar 4:5"
+    }
+  },
+  {
+    name: "NOIR DETECTIVE BOT",
+    params: {
+      race: "Android", gender: "Male", age: "Adult", role: "Mercenary", subRole: "Detective",
+      bodyType: "Stocky build", style: "Cinematic movie shot, 8k resolution, photorealistic, depth of field",
+      setting: "Futuristic Neon City", background: "Detailed Environment",
+      emotion: "Mysterious shadow over eyes", pose: "Looking away at the horizon",
+      framing: "Close-Up", lighting: "Dark/Moody", atmosphere: "Foggy",
+      colors: ["#1a1a1a", "#ff4500"], details: "Rusted metal face plating, smoking a holographic cigar, trench coat",
+      aspectRatio: "--ar 21:9"
+    }
+  },
+  {
+    name: "SPACE MARINE COMMANDER",
+    params: {
+      race: "Human", gender: "Female", age: "Middle-Aged", role: "Pilot", subRole: "Commander",
+      bodyType: "Heavily muscular", style: "Cinematic Realistic",
+      setting: "Sci-Fi Space Station interior", background: "Detailed Environment",
+      emotion: "Determined look", pose: "Standing in a heroic pose",
+      framing: "Low angle shot looking up, heroic", lighting: "Dramatic cinematic lighting, chiaroscuro", atmosphere: "Clear atmosphere",
+      colors: ["#000080", "#c0c0c0"], details: "Wearing heavy power armor with battle damage, holding a helmet under arm",
+      aspectRatio: "--ar 16:9"
+    }
+  },
+   {
+    name: "ORC WARLORD",
+    params: {
+      race: "Orc", gender: "Male", age: "Adult", role: "Warrior", subRole: "Chieftain",
+      bodyType: "Heavily muscular", style: "Oil Painting",
+      setting: "War-torn Battlefield", background: "Detailed Environment",
+      emotion: "Furious angry expression", pose: "Battle Stance",
+      framing: "Full Body", lighting: "Volumetric", atmosphere: "Dusty",
+      colors: ["#8b0000", "#2f4f4f"], details: "Wielding a massive dual-headed axe, warpaint on face, tribal tattoos",
+      aspectRatio: "--ar 3:2"
+    }
+  }
 ];

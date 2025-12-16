@@ -21,6 +21,57 @@
       .neon-text {
         text-shadow: 0 0 5px rgba(6, 182, 212, 0.8);
       }
+      
+      /* GLITCH EFFECT FOR TITLE */
+      .glitch-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+      .glitch {
+        position: relative;
+        color: white;
+        letter-spacing: -2px;
+      }
+      .glitch::before,
+      .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #030712; /* Matches background */
+      }
+      .glitch::before {
+        left: 2px;
+        text-shadow: -1px 0 #00ffff;
+        clip: rect(24px, 550px, 90px, 0);
+        animation: glitch-anim-2 3s infinite linear alternate-reverse;
+      }
+      .glitch::after {
+        left: -2px;
+        text-shadow: -1px 0 #ff00ff;
+        clip: rect(85px, 550px, 140px, 0);
+        animation: glitch-anim 2.5s infinite linear alternate-reverse;
+      }
+      
+      @keyframes glitch-anim {
+        0% { clip: rect(14px, 9999px, 121px, 0); }
+        20% { clip: rect(80px, 9999px, 86px, 0); }
+        40% { clip: rect(30px, 9999px, 92px, 0); }
+        60% { clip: rect(26px, 9999px, 15px, 0); }
+        80% { clip: rect(96px, 9999px, 10px, 0); }
+        100% { clip: rect(65px, 9999px, 49px, 0); }
+      }
+      @keyframes glitch-anim-2 {
+        0% { clip: rect(129px, 9999px, 36px, 0); }
+        20% { clip: rect(3px, 9999px, 4px, 0); }
+        40% { clip: rect(78px, 9999px, 94px, 0); }
+        60% { clip: rect(25px, 9999px, 66px, 0); }
+        80% { clip: rect(12px, 9999px, 149px, 0); }
+        100% { clip: rect(126px, 9999px, 100px, 0); }
+      }
+
       /* Custom Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
