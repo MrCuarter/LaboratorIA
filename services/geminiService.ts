@@ -3,17 +3,35 @@ import { CharacterParams, GeneratedData, ExpressionEntry } from "../types";
 
 const modelId = "gemini-2.5-flash";
 
-// Helper para obtener la instancia de IA solo cuando se necesita
+// Helper para obtener la instancia de IA de forma segura
 const getAI = () => {
   const apiKey = process.env.API_KEY;
+  
+  // Depuración en consola (F12)
   if (!apiKey) {
-    throw new Error("API Key no configurada. Por favor revisa tu archivo .env o configuración de Vercel.");
+    console.error("DEBUG: La API Key es undefined o null.");
+  } else if (apiKey === "") {
+    console.error("DEBUG: La API Key es un string vacío. Vite no la ha inyectado.");
+  } else {
+    console.log("DEBUG: API Key detectada. Longitud:", apiKey.length, "Últimos 4 chars:", apiKey.slice(-4));
   }
+
+  // Verificación estricta
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === "") {
+    throw new Error("API Key no configurada. Asegúrate de que la variable API_KEY existe en Vercel y has hecho Redeploy.");
+  }
+
   return new GoogleGenAI({ apiKey });
 };
 
 export const generatePrompt = async (params: CharacterParams): Promise<GeneratedData> => {
-  const ai = getAI(); // Inicialización Lazy
+  let ai;
+  try {
+    ai = getAI();
+  } catch (e: any) {
+    console.error("Failed to initialize AI:", e);
+    throw new Error(e.message);
+  }
   
   const isVideo = params.mode === 'video';
   const isMJ = params.promptFormat === 'midjourney';
@@ -101,7 +119,13 @@ export const generatePrompt = async (params: CharacterParams): Promise<Generated
  * PROTOCOLO PSYCHE 2.0: Genera 4 Hojas de Modelo maestras.
  */
 export const generateExpressionSheet = async (params: CharacterParams): Promise<ExpressionEntry[]> => {
-  const ai = getAI(); // Inicialización Lazy
+  let ai;
+  try {
+    ai = getAI();
+  } catch (e: any) {
+    console.error("Failed to initialize AI:", e);
+    throw new Error(e.message);
+  }
 
   const isMJ = params.promptFormat === 'midjourney';
   const aspectRatio = "--ar 3:2"; // Apaisado forzado para Character Sheets
