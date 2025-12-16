@@ -1,4 +1,5 @@
 import React from 'react';
+import { sfx } from '../services/audioEngine';
 
 interface ColorPickerProps {
   label: string;
@@ -12,11 +13,13 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label, selectedColors,
     if (selectedColors.length >= maxColors) return;
     if (!selectedColors.includes(hex)) {
       onChange([...selectedColors, hex]);
+      sfx.playClick();
     }
   };
 
   const removeColor = (hex: string) => {
     onChange(selectedColors.filter(c => c !== hex));
+    sfx.playClick();
   };
 
   return (
@@ -27,11 +30,14 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label, selectedColors,
       
       <div className="bg-slate-900/80 border border-slate-700 p-3 rounded-sm flex items-center gap-3 min-h-[50px] relative">
         {/* Add Button (Hidden input hack) */}
-        <label className={`
-          flex items-center justify-center w-8 h-8 rounded-full border-2 border-dashed border-slate-600 
-          text-slate-500 hover:text-cyan-400 hover:border-cyan-500 cursor-pointer transition-colors
-          ${selectedColors.length >= maxColors ? 'opacity-30 cursor-not-allowed' : ''}
-        `}>
+        <label 
+           onMouseEnter={() => sfx.playHover()}
+           className={`
+            flex items-center justify-center w-8 h-8 rounded-full border-2 border-dashed border-slate-600 
+            text-slate-500 hover:text-cyan-400 hover:border-cyan-500 cursor-pointer transition-colors
+            ${selectedColors.length >= maxColors ? 'opacity-30 cursor-not-allowed' : ''}
+          `}
+        >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4"/></svg>
           <input 
             type="color" 

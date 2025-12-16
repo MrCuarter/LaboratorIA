@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GeneratedData } from '../types';
+import { sfx } from '../services/audioEngine';
 
 interface TerminalOutputProps {
   data: GeneratedData | null;
@@ -11,6 +12,7 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ data, loading })
   const [copiedNegative, setCopiedNegative] = useState(false);
 
   const copyToClipboard = (text: string, isPositive: boolean) => {
+    sfx.playClick();
     navigator.clipboard.writeText(text);
     if (isPositive) {
       setCopiedPositive(true);
@@ -51,6 +53,7 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ data, loading })
                  <span className="text-green-400 font-mono text-xs font-bold">&gt;&gt; PROMPT PRINCIPAL</span>
                  <button 
                   onClick={() => copyToClipboard(data!.prompt, true)}
+                  onMouseEnter={() => sfx.playHover()}
                   className="text-xs bg-slate-800 hover:bg-cyan-700 hover:text-white text-cyan-400 px-2 py-1 rounded transition-colors uppercase font-mono"
                  >
                    {copiedPositive ? 'Copiado!' : 'Copiar'}
@@ -67,6 +70,7 @@ export const TerminalOutput: React.FC<TerminalOutputProps> = ({ data, loading })
                  <span className="text-red-400 font-mono text-xs font-bold">&gt;&gt; NEGATIVE PROMPT</span>
                  <button 
                   onClick={() => copyToClipboard(data!.negativePrompt, false)}
+                  onMouseEnter={() => sfx.playHover()}
                   className="text-xs bg-slate-800 hover:bg-red-900 hover:text-white text-red-400 px-2 py-1 rounded transition-colors uppercase font-mono"
                  >
                    {copiedNegative ? 'Copiado!' : 'Copiar'}

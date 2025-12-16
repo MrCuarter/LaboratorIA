@@ -1,4 +1,5 @@
 import React from 'react';
+import { sfx } from '../services/audioEngine'; // Import SFX
 
 interface Option {
   label: string;
@@ -21,7 +22,11 @@ export const FuturisticSelect: React.FC<FuturisticSelectProps> = ({ label, value
       <div className="relative">
         <select
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+             onChange(e.target.value);
+             sfx.playClick();
+          }}
+          onMouseEnter={() => sfx.playHover()}
           className="w-full bg-slate-900/80 border border-slate-700 text-slate-200 p-3 pr-8 rounded-sm focus:outline-none focus:border-cyan-500 focus:shadow-[0_0_10px_rgba(6,182,212,0.3)] appearance-none transition-all duration-300"
         >
           <option value="">-- {label} --</option>

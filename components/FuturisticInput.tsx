@@ -1,4 +1,5 @@
 import React from 'react';
+import { sfx } from '../services/audioEngine';
 
 interface FuturisticInputProps {
   label: string;
@@ -9,6 +10,14 @@ interface FuturisticInputProps {
 }
 
 export const FuturisticInput: React.FC<FuturisticInputProps> = ({ label, value, onChange, placeholder, multiline = false }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+    // Solo reproducir sonido si el texto aumenta (typing)
+    if (e.target.value.length > value.length) {
+       sfx.playTyping();
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-2 group">
       <label className="text-cyan-400 text-xs uppercase tracking-widest font-semibold ml-1 group-hover:text-cyan-300 transition-colors">
@@ -18,7 +27,8 @@ export const FuturisticInput: React.FC<FuturisticInputProps> = ({ label, value, 
         {multiline ? (
           <textarea
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={handleChange}
+            onMouseEnter={() => sfx.playHover()}
             placeholder={placeholder}
             rows={3}
             className="w-full bg-slate-900/80 border border-slate-700 text-slate-200 p-3 rounded-sm focus:outline-none focus:border-cyan-500 focus:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all duration-300 placeholder-slate-600 resize-none"
@@ -27,7 +37,8 @@ export const FuturisticInput: React.FC<FuturisticInputProps> = ({ label, value, 
           <input
             type="text"
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={handleChange}
+            onMouseEnter={() => sfx.playHover()}
             placeholder={placeholder}
             className="w-full bg-slate-900/80 border border-slate-700 text-slate-200 p-3 rounded-sm focus:outline-none focus:border-cyan-500 focus:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all duration-300 placeholder-slate-600"
           />

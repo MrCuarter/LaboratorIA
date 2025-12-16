@@ -10,9 +10,11 @@ import { generatePrompt, generateExpressionSheet } from './services/geminiServic
 import { buildLocalPrompt } from './services/promptBuilder'; 
 import { CharacterParams, GeneratedData, LoadingState, Language, ExpressionEntry } from './types';
 import * as C from './constants';
+import { sfx } from './services/audioEngine'; // Import SFX
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ES');
+  const [isMuted, setIsMuted] = useState(false); // Mute state
   
   const [params, setParams] = useState<CharacterParams>({
     mode: 'image',
@@ -50,13 +52,30 @@ const App: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.IDLE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Initialize Audio & Startup Sound
+  useEffect(() => {
+    const handleInteraction = () => {
+       sfx.playStartup();
+       window.removeEventListener('click', handleInteraction);
+    };
+    window.addEventListener('click', handleInteraction);
+    return () => window.removeEventListener('click', handleInteraction);
+  }, []);
+
   // Update live prompt whenever params change
   useEffect(() => {
     const prompt = buildLocalPrompt(params);
     setLivePrompt(prompt);
   }, [params]);
 
+  const toggleMute = () => {
+    const muted = sfx.toggleMute();
+    setIsMuted(muted);
+    if (!muted) sfx.playClick();
+  };
+
   const handleCopyLive = () => {
+    sfx.playClick();
     navigator.clipboard.writeText(livePrompt);
     setCopiedLive(true);
     setTimeout(() => setCopiedLive(false), 2000);
@@ -64,6 +83,7 @@ const App: React.FC = () => {
 
   // AI GENERATION (Expression Sheet - PSYCHE)
   const handleGenerateExpressions = async () => {
+     sfx.playClick();
      if (!params.race && !params.role && !params.details) {
       setErrorMsg(lang === 'ES' ? "Define el personaje primero." : "Define character first.");
       setTimeout(() => setErrorMsg(null), 3000);
@@ -78,6 +98,7 @@ const App: React.FC = () => {
         const sheet = await generateExpressionSheet(params);
         setExpressionSheet(sheet);
         setLoadingState(LoadingState.SUCCESS);
+        sfx.playSuccess(); // Success Sound
         setTimeout(() => document.getElementById('expression-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (error) {
         console.error(error);
@@ -88,6 +109,7 @@ const App: React.FC = () => {
 
   // AI GENERATION (Single Prompt - STANDARD)
   const handleGenerate = async () => {
+    sfx.playClick();
     if (!params.race && !params.role && !params.details) {
       setErrorMsg(t.errorRequired);
       return;
@@ -101,6 +123,7 @@ const App: React.FC = () => {
       const result = await generatePrompt(params);
       setGeneratedData(result);
       setLoadingState(LoadingState.SUCCESS);
+      sfx.playSuccess(); // Success Sound
     } catch (error) {
       console.error(error);
       setErrorMsg(t.errorApi);
@@ -109,24 +132,24 @@ const App: React.FC = () => {
   };
 
   const handleCopyMatrixItem = (text: string, index: number) => {
+    sfx.playClick();
     navigator.clipboard.writeText(text);
     setCopiedMatrixIndex(index);
     setTimeout(() => setCopiedMatrixIndex(null), 1500);
   };
 
   const handleCopyAllExpressions = () => {
+    sfx.playClick();
     if (!expressionSheet) return;
     const isMJ = params.promptFormat === 'midjourney';
 
     let intro = "";
     
     if (isMJ) {
-       // Instrucciones específicas para Midjourney (Listado de comandos)
        intro = lang === 'ES'
         ? "Aquí tienes una lista de 4 prompts para Midjourney. Por favor, preséntamelos en bloques de código separados para que pueda copiarlos y pegarlos en Discord fácilmente:\n\n"
         : "Here is a list of 4 Midjourney prompts. Please display them in separate code blocks so I can easily copy and paste them into Discord:\n\n";
     } else {
-       // Instrucciones para Generación directa en DALL-E/Imagen (ChatGPT/Gemini)
        intro = lang === 'ES'
         ? "Actúa como un generador de imágenes experto. Necesito crear un Kit de Diseño de Personaje completo. Por favor, genera las siguientes 4 imágenes secuencialmente (una tras otra) utilizando exactamente las descripciones provistas a continuación. Mantén la consistencia visual:\n\n"
         : "Act as an expert image generator. I need to create a full Character Design Kit. Please generate the following 4 images sequentially (one after another) using exactly the descriptions provided below. Maintain visual consistency:\n\n";
@@ -144,6 +167,7 @@ const App: React.FC = () => {
   };
   
   const handleElitePreset = () => {
+    sfx.playClick();
     const randomPreset = C.PRESETS[Math.floor(Math.random() * C.PRESETS.length)];
     setParams(prev => ({
         ...prev,
@@ -162,6 +186,7 @@ const App: React.FC = () => {
   const getRandom = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)].value;
 
   const handleRandomize = () => {
+    sfx.playClick();
     const isVideo = Math.random() > 0.5;
     setParams(prev => ({
       ...prev,
@@ -319,6 +344,7 @@ const App: React.FC = () => {
             <a 
             href="https://mistercuarter.es"
             className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[90px] md:min-w-[100px] rounded-sm"
+            onMouseEnter={() => sfx.playHover()} // SFX
             >
             <span className="absolute inset-0 w-full h-full bg-cyan-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>
             <span className="relative z-10 flex items-center gap-2">
@@ -329,6 +355,7 @@ const App: React.FC = () => {
             <a 
             href="https://laboratorio.mistercuarter.es"
             className="relative group px-3 py-1.5 md:px-4 md:py-2 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-[10px] md:text-xs font-mono font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center min-w-[110px] md:min-w-[120px] rounded-sm"
+            onMouseEnter={() => sfx.playHover()} // SFX
             >
             <span className="absolute inset-0 w-full h-full bg-cyan-500/20 translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>
             <span className="relative z-10 flex items-center gap-2">
@@ -338,19 +365,40 @@ const App: React.FC = () => {
             </a>
         </div>
 
-        {/* Right: Brand + Logo + Language Switcher */}
+        {/* Right: Brand + Logo + Language Switcher + Mute */}
         <div className="flex items-center gap-3 md:gap-4">
-            <div className="flex items-center gap-3 cursor-pointer group">
+            <div className="flex items-center gap-3 cursor-pointer group" onMouseEnter={() => sfx.playHover()}>
                 <h2 className="hidden md:block text-lg font-bold tracking-wider text-slate-200 group-hover:text-cyan-400 transition-colors brand-font">
                     NEO<span className="text-cyan-500">GENESIS</span>
                 </h2>
                 <Logo className="w-10 h-10 md:w-12 md:h-12 shrink-0 group-hover:rotate-180 transition-transform duration-700" />
             </div>
 
-            {/* Language Toggle (Moved here) */}
+             {/* Mute Toggle */}
+             <button
+                onClick={toggleMute}
+                className={`relative group w-8 h-8 md:w-10 md:h-10 overflow-hidden bg-slate-900 border ${isMuted ? 'border-red-900 text-red-700' : 'border-slate-700 text-cyan-500'} text-[10px] font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center rounded-sm`}
+                title="Toggle SFX"
+                onMouseEnter={() => sfx.playHover()}
+              >
+                 <span className={`absolute inset-0 w-full h-full ${isMuted ? 'bg-red-500/10' : 'bg-cyan-500/20'} scale-0 group-hover:scale-100 transition-transform duration-300 rounded-sm`}></span>
+                 <span className="relative z-10">
+                     {isMuted ? (
+                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                     ) : (
+                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                     )}
+                 </span>
+            </button>
+
+            {/* Language Toggle */}
              <button 
-                onClick={() => setLang(prev => prev === 'ES' ? 'EN' : 'ES')}
+                onClick={() => {
+                  setLang(prev => prev === 'ES' ? 'EN' : 'ES');
+                  sfx.playClick();
+                }}
                 className="relative group w-8 h-8 md:w-10 md:h-10 overflow-hidden bg-slate-900 border border-slate-700 text-cyan-500 text-[10px] font-bold tracking-widest uppercase hover:text-white transition-colors flex items-center justify-center rounded-sm"
+                onMouseEnter={() => sfx.playHover()}
               >
                  <span className="absolute inset-0 w-full h-full bg-cyan-500/20 scale-0 group-hover:scale-100 transition-transform duration-300 rounded-sm"></span>
                  <span className="relative z-10">
@@ -383,6 +431,7 @@ const App: React.FC = () => {
            <div className="flex justify-center mt-6">
                 <button
                     onClick={handleElitePreset}
+                    onMouseEnter={() => sfx.playHover()}
                     className="group relative px-6 py-2 bg-transparent border-y border-cyan-500/30 hover:border-cyan-400 transition-all overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-cyan-500/10 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
@@ -403,14 +452,20 @@ const App: React.FC = () => {
           <FuturisticToggle 
             leftLabel={t.modeImg} rightLabel={t.modeVid}
             value={params.mode} leftValue="image" rightValue="video"
-            onChange={(v) => setParams(prev => ({...prev, mode: v}))}
+            onChange={(v) => {
+               setParams(prev => ({...prev, mode: v}));
+               sfx.playClick();
+            }}
           />
 
           {/* Format Toggle */}
           <FuturisticToggle 
              leftLabel={t.fmtMJ} rightLabel={t.fmtGen}
              value={params.promptFormat} leftValue="midjourney" rightValue="generic"
-             onChange={(v) => setParams(prev => ({...prev, promptFormat: v}))}
+             onChange={(v) => {
+                setParams(prev => ({...prev, promptFormat: v}));
+                sfx.playClick();
+             }}
           />
         </div>
 
@@ -426,6 +481,7 @@ const App: React.FC = () => {
             <div className="absolute -top-5 right-10 md:right-20 z-20">
               <button 
                 onClick={handleRandomize}
+                onMouseEnter={() => sfx.playHover()}
                 className="bg-slate-950 border border-purple-500/50 text-purple-400 hover:text-white hover:bg-purple-900/30 hover:border-purple-400 px-4 py-1 text-[10px] uppercase font-bold tracking-widest transition-all shadow-[0_0_10px_rgba(168,85,247,0.2)] flex items-center gap-2 group"
               >
                 <svg className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -497,6 +553,7 @@ const App: React.FC = () => {
                 </span>
                 <button
                    onClick={handleCopyLive}
+                   onMouseEnter={() => sfx.playHover()}
                    className="text-[10px] bg-slate-800 border border-slate-600 hover:bg-cyan-900 hover:text-white hover:border-cyan-500 text-slate-300 px-3 py-1 uppercase font-bold tracking-widest transition-all"
                 >
                    {copiedLive ? 'COPIED!' : t.btnCopyLive}
@@ -514,6 +571,7 @@ const App: React.FC = () => {
              <button
               onClick={handleGenerate}
               disabled={loadingState === LoadingState.LOADING}
+              onMouseEnter={() => sfx.playHover()}
               className={`
                 relative px-8 py-4 bg-transparent overflow-hidden group
                 text-cyan-400 font-bold uppercase tracking-[0.2em] text-xs md:text-sm transition-all
@@ -541,6 +599,7 @@ const App: React.FC = () => {
              <button
               onClick={handleGenerateExpressions}
               disabled={loadingState === LoadingState.LOADING}
+              onMouseEnter={() => sfx.playHover()}
               className={`
                 relative px-12 py-5 bg-transparent overflow-hidden group
                 text-amber-400 font-bold uppercase tracking-[0.2em] text-sm md:text-base transition-all
@@ -575,6 +634,7 @@ const App: React.FC = () => {
                 </h3>
                 <button
                    onClick={handleCopyAllExpressions}
+                   onMouseEnter={() => sfx.playHover()}
                    className="w-full md:w-auto text-sm md:text-base bg-amber-600/20 border border-amber-500 hover:bg-amber-500 hover:text-black text-amber-300 px-6 py-4 uppercase font-black tracking-widest transition-all rounded-sm flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] transform hover:-translate-y-1"
                 >
                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
@@ -597,6 +657,7 @@ const App: React.FC = () => {
                          </span>
                          <button
                             onClick={() => handleCopyMatrixItem(item.prompt, idx)} 
+                            onMouseEnter={() => sfx.playHover()}
                             className="text-slate-500 hover:text-white transition-colors p-1"
                          >
                             {copiedMatrixIndex === idx ? (
@@ -654,7 +715,9 @@ const App: React.FC = () => {
 };
 
 const SocialIcon: React.FC<{href: string, icon: string}> = ({href, icon}) => (
-  <a href={href} target="_blank" className="w-10 h-10 flex items-center justify-center border border-slate-800 bg-slate-900 rounded-sm text-slate-500 hover:text-cyan-400 hover:border-cyan-500 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all group">
+  <a href={href} target="_blank" 
+     onMouseEnter={() => sfx.playHover()}
+     className="w-10 h-10 flex items-center justify-center border border-slate-800 bg-slate-900 rounded-sm text-slate-500 hover:text-cyan-400 hover:border-cyan-500 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all group">
     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
       <path d={icon}/>
     </svg>
